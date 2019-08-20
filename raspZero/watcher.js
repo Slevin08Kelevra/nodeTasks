@@ -1,37 +1,46 @@
 const puppeteer = require('puppeteer');
-const cron = require('node-cron');
+//const cron = require('node-cron');
 
 
 //page.on('console', consoleObj => console.log(consoleObj.text()));
 async function readMessages() {
-    console.log("extremos token " + moment().format());
-    const browser = await puppeteer.launch()
-    extractionRequestIgnited = false;
+    
+    const browser = await puppeteer.launch();
     try {
-        response.message = "Searching Token";
-        const page = await browser.newPage()
-        await page.setViewport({ width: 1280, height: 800 })
-        await page.goto('https://web.furycloud.io/#/login', { waitUntil: 'load', timeout: 0 })
-        await page.waitForSelector('[name="x-userName"]');
-        await page.type('[name="x-userName"]', process.env.USER)
-        await page.type('[name="x-password"]', process.env.PASS)
-        await page.click('button.btn.btn-default.btn-primary.pull-right')
+        const page = await browser.newPage();
+        //page.setUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)");
+        page.on('console', consoleObj => console.log(consoleObj.text()));
+        //await page.setViewport({ width: 1280, height: 800 })
+        await page.goto('http://192.168.0.1/html/home.html', { waitUntil: 'load', timeout: 0 })
+        //await page.waitForSelector('#username');
 
-        //await page.waitFor(3000)
-        await page.waitForSelector('ul.pagination', { visible: true })
-        await page.click('button.btn.dropdown-toggle.dropdown-menu-right')
+        /* await page.click('span.logout');
+        await page.waitForSelector('#username');
+        await page.type('#username', process.env.USER)
+        await page.type('#password', process.env.PASS)
+        await page.click('span.button_center > a')
+        await page.waitFor(1000);  */
+
+        //await page.waitForSelector('ul.pagination', { visible: true })
+        //await page.click('button.btn.dropdown-toggle.dropdown-menu-right')
         //const tokenLink = await page.$$('li.dropdown-item > a')
         //tokenLink[0].click()
 
-        await page.$eval('div.modal-content > div.modal-body > p', function (heading) {
-            return heading.innerText;
+        await page.$eval('#logout_span', function (span) {
+            return span.innerText;
         }).then(function (result) {
-            response.token = result
-            response.message = "Token Extracted!";
-            response.error = "No Errors";
-            validTo = moment().add(tokenValidTime, 'hour');
-            extractionTime = moment();
+            console.log(result);
         });
+
+        await page.click('#sms');
+        await page.waitForSelector('span.button_right > span.button_center');
+        await page.$eval('span.button_right > span.button_center', function (span) {
+            return span.innerText;
+        }).then(function (result) {
+            console.log(result);
+        });
+
+
     } catch (error) {
         throw error;
     } finally {
@@ -40,3 +49,5 @@ async function readMessages() {
     }
 
 }
+
+readMessages();

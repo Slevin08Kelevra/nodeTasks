@@ -1,0 +1,77 @@
+<li id="menu_sms">
+    <a id="sms" href="smsinbox.html" class="active">
+        <span>SMS</span>
+    </a>
+</li>
+
+<span class="button_right">
+    <span class="button_center">New Message</span>
+</span>
+
+
+<td class="td_pl sms_phone_width">
+    <table border="0" cellpadding="0" class="sms_msg" cellspacing="0">
+        <tbody>
+            <tr>
+                <td>
+                    <span id="smsReadStatesa6" class="msg_icon read_state0 ">&nbsp;</span>
+                </td>
+                <td class="sms_phone_number">3235</td>
+            </tr>
+        </tbody>
+    </table>
+</td>
+
+<td class="td_pl sms_content_width">
+    <pre class="sms_content">DE MOVISTAR: Recibimos un pago de 341,09. Si abonaste el total de tu factura y tu linea esta interrumpida, espera 2hs y apaga/prende el celular para reestablec#</pre>
+</td>
+
+<td class="td_pl sms_date_width"><label>2019-08-19 23:26:45</label></td>
+
+//
+<div class="sms_dialog_content">
+    <div class="sms_dialog_header">
+        <span class="dialog_header_left">Message</span>
+        <span class="dialog_header_right">
+            <a class="dialog_close_btn" title="" href="javascript:void(0);" tabindex="-1">
+                <img src="../res/dialog_close_btn.png" title="" alt="">
+                </a>
+            </span>
+        </div>
+        <div class="sms_dialog_table">
+            <div class="sms_message">
+                <p id="recipients_sender">From:</p>
+                <div id="sms_number_wrapper">
+                    <input type="text" id="recipients_number" name="recipients_number" value="" tabindex="0" readonly="readonly">
+                    </div>
+                    <p>Content:</p>
+                    <textarea id="message_content" readonly="readonly"></textarea>
+                    <p id="sms_count">(160)</p>
+                </div>
+            </div>
+            <div class="sms_dialog_table_bottom">
+                <div class="dialog_table_r">
+                    <span class="button_wrapper pop_reply" id="pop_reply">
+                        <span class="button_left">
+                            <span class="button_right">
+                                <span class="button_center">Reply</span>
+                            </span>
+                        </span>
+                    </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="button_wrapper pop_forward" id="pop_forward">
+                        <span class="button_left">
+                            <span class="button_right">
+                                <span class="button_center">Forward</span>
+                            </span>
+                        </span>
+                    </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="button_wrapper pop_Cancel" id="pop_Cancel">
+                        <span class="button_left">
+                            <span class="button_right">
+                                <span class="button_center">Cancel</span>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
