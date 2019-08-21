@@ -14,12 +14,12 @@ async function readMessages() {
         await page.goto('http://192.168.0.1/html/home.html', { waitUntil: 'load', timeout: 0 })
         //await page.waitForSelector('#username');
 
-        /* await page.click('span.logout');
+        await page.click('span.logout');
         await page.waitForSelector('#username');
         await page.type('#username', process.env.USER)
         await page.type('#password', process.env.PASS)
         await page.click('span.button_center > a')
-        await page.waitFor(1000);  */
+        await page.waitFor(1000);
 
         //await page.waitForSelector('ul.pagination', { visible: true })
         //await page.click('button.btn.dropdown-toggle.dropdown-menu-right')
