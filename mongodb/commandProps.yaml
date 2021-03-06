@@ -1,0 +1,46 @@
+# List of commands and configurations
+
+general_vars:
+  key_file_name: &kname mongoCA.key
+  key_passwrd: &kpass 1234qwer
+  ca_crt: &cacrt mongoCA.crt
+  replica_size: &repsize 3
+
+create_certs:
+  - function: getSimpleChildExecutor
+    cmd_args: [*kpass, *kname]
+    args: 
+      name: createKey
+      cmd: "openssl genrsa -aes256 -passout pass:%s -out %s 8192"
+  - function: getFileChecker
+    name_args: [*kname]
+    args:
+      name:  "check if %s exists"
+      path: *kname
+  - function: getSimpleChildExecutor
+    cmd_args: [*kname, *cacrt, *kpass]
+    args:
+      name: createIssuer
+      cmd: "openssl req -x509 -new -key %s -days 365 -out %s -config openssl_ext.conf -passin pass:%s"
+  - function: getSimpleChildExecutor
+    node_repeat: true
+    args: 
+      name: createNodeKey node %i
+      cmd: "openssl req -new -nodes -newkey rsa:4096 -keyout mongo%i.key -out mongo%i.csr -config openssl_ext_node_%i.conf"
+  - function: getSimpleChildExecutor
+    cmd_args: [*cacrt, *kname, *kpass]
+    node_repeat: true
+    args:
+      name: createNodeCrt node %i
+      cmd: "openssl x509 -CA %s -CAkey %s -CAcreateserial -req -days 365 -in mongo%i.csr -out mongo%i.crt -passin pass:%s"
+  - function: getSimpleChildExecutor
+    node_repeat: true
+    args:
+      name: createNodePem node %i
+      cmd: "cat mongo%i.key mongo%i.crt > mongo%i.pem"
+  - function: getSimpleChildExecutor
+    node_repeat: true
+    args:
+      name: createNodePfx node %i
+      cmd: "openssl pkcs12 -inkey mongo%i.key -in mongo%i.crt -export -out mongo%i.pfx -passout pass:"
+   
