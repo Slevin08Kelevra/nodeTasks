@@ -5,8 +5,13 @@ general_vars:
   key_passwrd: &kpass 1234qwer
   ca_crt: &cacrt mongoCA.crt
   replica_size: &repsize 3
+  dir: &wrokdir /home/pablo/certTest
 
 create_certs:
+  - function: getSimpleChildExecutor
+    args: 
+      name: removingFiles
+      cmd: "rm mongo*"
   - function: getSimpleChildExecutor
     cmd_args: [*kpass, *kname]
     args: 

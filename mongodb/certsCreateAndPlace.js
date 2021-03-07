@@ -3,6 +3,29 @@ const { exec } = require('child_process');
 const execAsync = promisify(exec);
 const fs = require('fs')
 const yaml = require('js-yaml');
+var AWS = require('aws-sdk');
+
+var credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
+AWS.config.credentials = credentials;
+var params = {
+    Filters: [
+        {
+            Name: "instance-type",
+            Values: [
+                "t2.micro"
+            ]
+        }
+    ]
+};
+var ec2 = new AWS.EC2({region: 'us-east-2'});
+ec2.describeInstances(params, function (err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else console.log(data.Reservations[0].Instances[0].Tags[0].Key);           // successful response
+    /*
+    data = {
+    }
+    */
+});
 
 var funcs = []
 
@@ -35,6 +58,24 @@ funcs.getSimpleChildExecutor = (args) => {
     return new command(func)
 }
 
+funcs.getChildExecutorWithReturn = (args) => {
+    let func = async () => {
+        try {
+            const { stdout, stderr } = await execAsync(args.cmd)
+            if (stderr != "") {
+                throw "error"
+            } else {
+                console.log(stdout.trim())
+            }
+        } catch (e) {
+            console.error(e.message.trim());
+            throw args.name + ' execution aborted'
+        }
+        console.log(args.name + ": OK")
+    }
+    return new command(func)
+}
+
 // Get document, or throw exception on error
 var props
 try {
@@ -44,8 +85,9 @@ try {
     process.exit(1)
 }
 
-let commands = []
+process.chdir(props.general_vars.dir);
 
+let commands = []
 props.create_certs.forEach(action => {
     let fn = action.function
     if (action.cmd_args) {
@@ -61,7 +103,6 @@ props.create_certs.forEach(action => {
                 Object.assign(argsCloned, action.args)
                 argsCloned.cmd = argsCloned.cmd.replace(/%i/g, index)
                 argsCloned.name = argsCloned.name.replace(/%i/g, index)
-                console.log(argsCloned.cmd)
                 commands.push(funcs[fn](argsCloned))
             }
         } else {
