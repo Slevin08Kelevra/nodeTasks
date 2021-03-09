@@ -18,14 +18,7 @@ var params = {
     ]
 };
 var ec2 = new AWS.EC2({region: 'us-east-2'});
-ec2.describeInstances(params, function (err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
-    else console.log(data.Reservations[0].Instances[0].Tags[0].Key);           // successful response
-    /*
-    data = {
-    }
-    */
-});
+var dnsNames
 
 var funcs = []
 
@@ -88,38 +81,62 @@ try {
 process.chdir(props.general_vars.dir);
 
 let commands = []
-props.create_certs.forEach(action => {
-    let fn = action.function
-    if (action.cmd_args) {
-        action.args.cmd = parse(action.args.cmd, ...action.cmd_args)
-    }
-    if (action.name_args) {
-        action.args.name = parse(action.args.name, ...action.name_args)
-    }
-    if (fn in funcs && typeof funcs[fn] === "function") {
-        if (action.node_repeat) {
-            for (let index = 1; index <= props.general_vars.replica_size; index++) {
-                let argsCloned = {}
-                Object.assign(argsCloned, action.args)
-                argsCloned.cmd = argsCloned.cmd.replace(/%i/g, index)
-                argsCloned.name = argsCloned.name.replace(/%i/g, index)
-                commands.push(funcs[fn](argsCloned))
+
+function prepareCommands(){
+    props.create_certs.forEach(action => {
+        let fn = action.function
+        if (action.cmd_args) {
+            action.args.cmd = parse(action.args.cmd, ...action.cmd_args)
+        }
+        if (action.name_args) {
+            action.args.name = parse(action.args.name, ...action.name_args)
+        }
+        if (fn in funcs && typeof funcs[fn] === "function") {
+            if (action.node_repeat) {
+                for (let index = 1; index <= props.general_vars.replica_size; index++) {
+                    let argsCloned = {}
+                    Object.assign(argsCloned, action.args)
+                    argsCloned.cmd = argsCloned.cmd.replace(/%i/g, index)
+                    argsCloned.cmd = argsCloned.cmd.replace(/%POD_NAME/g, dnsNames[index-1])
+                    argsCloned.name = argsCloned.name.replace(/%i/g, index)
+                    commands.push(funcs[fn](argsCloned))
+                }
+            } else {
+                commands.push(funcs[fn](action.args))
             }
         } else {
-            commands.push(funcs[fn](action.args))
+            console.error(fn + " not found!")
+            process.exit(1)
         }
-    } else {
-        console.error(fn + " not found!")
-        process.exit(1)
-    }
+    
+    });
+}
 
+ec2.describeInstances(params, function (err, data) {
+    if (err) {
+        console.log(err, err.stack);
+        process.exit(1)
+    } 
+    else {
+        dnsNames = data.Reservations.filter( res => {
+            return res.Instances[0].Tags[0].Value.startsWith("mongodb")
+        }).map(res => { 
+            return res.Instances[0].PublicDnsName
+        });
+        prepareCommands()
+        start()
+    }
 });
 
-sequentialExecution(commands).then(() => {
-    console.log('Command sequence terminated ok');
-}).catch((error) => {
-    console.error(error)
-})
+function start(){
+
+    sequentialExecution(commands).then(() => {
+        console.log('Command sequence terminated ok');
+    }).catch((error) => {
+        console.error(error)
+    })
+    
+}
 
 async function sequentialExecution(commands) {
 

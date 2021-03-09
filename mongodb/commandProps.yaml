@@ -6,6 +6,8 @@ general_vars:
   ca_crt: &cacrt mongoCA.crt
   replica_size: &repsize 3
   dir: &wrokdir /home/pablo/certTest
+  awspodkey: &podkey /home/pablo/dumps/firstKey.pem
+  awscertloc: &certloc /home/ubuntu/tls/auto
 
 create_certs:
   - function: getSimpleChildExecutor
@@ -47,5 +49,25 @@ create_certs:
     node_repeat: true
     args:
       name: createNodePfx node %i
-      cmd: "openssl pkcs12 -inkey mongo%i.key -in mongo%i.crt -export -out mongo%i.pfx -passout pass:"
-   
+      cmd: "openssl pkcs12 -inkey mongo%i.key -in mongo%i.crt -export -out mongo%i.pfx -passout pass:1234qwer -name 'lala'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc]
+    node_repeat: true
+    args:
+      name: removeCertFiles node %i
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/*.*'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc]
+    node_repeat: true
+    args:
+      name: uploadPems node %i
+      cmd: "scp -i %s mongo%i.pem ubuntu@%POD_NAME:%s"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *cacrt, *certloc]
+    node_repeat: true
+    args:
+      name: uploadCerts node %i
+      cmd: "scp -i %s %s ubuntu@%POD_NAME:%s"
+  
+# keytool -import -alias server -file mongoCA.crt -keystore truststore.jks -storepass truststore -noprompt
+# keytool -importkeystore -deststorepass 1234qwer -srckeystore mongo1.pfx -srcstoretype pkcs12 -destkeystore keystore.jks -deststoretype pkcs12 -srcstorepass 1234qwer
