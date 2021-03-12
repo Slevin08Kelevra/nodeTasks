@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
 var AWS = require('aws-sdk');
 const { MongoClient } = require("mongodb");
 
-var url = "mongodb://admin:1234qwer@ec2-3-131-159-91.us-east-2.compute.amazonaws.com:27026?tls=true"
+var url = ""
 const client = new MongoClient(url, {
   tlsCAFile: `/home/pablo/certTest/mongo1certs/mongoCA.crt`,
   tlsCertificateKeyFile: `/home/pablo/certTest/mongo1certs/mongo.pem`,
