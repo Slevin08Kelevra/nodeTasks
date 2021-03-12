@@ -4,6 +4,29 @@ const execAsync = promisify(exec);
 const fs = require('fs')
 const yaml = require('js-yaml');
 var AWS = require('aws-sdk');
+const { MongoClient } = require("mongodb");
+
+var url = "mongodb://admin:1234qwer@ec2-3-131-159-91.us-east-2.compute.amazonaws.com:27026?tls=true"
+const client = new MongoClient(url, {
+  tlsCAFile: `/home/pablo/certTest/mongo1certs/mongoCA.crt`,
+  tlsCertificateKeyFile: `/home/pablo/certTest/mongo1certs/mongo.pem`,
+  useUnifiedTopology: true
+});
+
+async function run() {
+    try {
+      await client.connect();
+      const db = client.db("admin");
+      const result = await db.command({
+        dbStats: 1,
+      });
+      console.log(result);
+    } finally {
+      await client.close();
+    }
+  }
+  //run().catch(console.dir);
+
 
 var credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
 AWS.config.credentials = credentials;
@@ -17,8 +40,8 @@ var params = {
         }
     ]
 };
-var ec2 = new AWS.EC2({region: 'us-east-2'});
-var dnsNames
+var ec2 = new AWS.EC2({ region: 'us-east-2' });
+var dnsNames = {}
 
 var funcs = []
 
@@ -81,8 +104,9 @@ try {
 process.chdir(props.general_vars.dir);
 
 let commands = []
+let awsData
 
-function prepareCommands(){
+function prepareCommands() {
     props.create_certs.forEach(action => {
         let fn = action.function
         if (action.cmd_args) {
@@ -97,10 +121,18 @@ function prepareCommands(){
                     let argsCloned = {}
                     Object.assign(argsCloned, action.args)
                     argsCloned.cmd = argsCloned.cmd.replace(/%i/g, index)
-                    argsCloned.cmd = argsCloned.cmd.replace(/%POD_NAME/g, dnsNames[index-1])
+                    argsCloned.cmd = argsCloned.cmd.replace(/%POD_NAME/g, dnsNames[`${index}`])
                     argsCloned.name = argsCloned.name.replace(/%i/g, index)
                     commands.push(funcs[fn](argsCloned))
                 }
+            } else if (action.special_node){
+                let dns = awsData.Reservations.find(res => {
+                    return res.Instances[0].Tags.find(tag => {               
+                        return tag.Key === "Name"
+                    }).Value == action.special_node
+                }).Instances[0].PublicDnsName
+                action.args.cmd = action.args.cmd.replace(/%POD_NAME/g, dns)
+                commands.push(funcs[fn](action.args))
             } else {
                 commands.push(funcs[fn](action.args))
             }
@@ -108,7 +140,7 @@ function prepareCommands(){
             console.error(fn + " not found!")
             process.exit(1)
         }
-    
+
     });
 }
 
@@ -116,26 +148,33 @@ ec2.describeInstances(params, function (err, data) {
     if (err) {
         console.log(err, err.stack);
         process.exit(1)
-    } 
+    }
     else {
-        dnsNames = data.Reservations.filter( res => {
-            return res.Instances[0].Tags[0].Value.startsWith("mongodb")
-        }).map(res => { 
-            return res.Instances[0].PublicDnsName
+        awsData = data
+        data.Reservations.filter(res => {
+            return res.Instances[0].Tags.find(tag => {               
+                return tag.Key === "Name"
+            }).Value.startsWith("mongodb")
+        }).forEach(res => {
+            let key = res.Instances[0].Tags.find(tag => {
+                return tag.Key.toLowerCase() === 'index'
+            }).Value
+            dnsNames[key] = res.Instances[0].PublicDnsName
         });
+        //console.log(dnsNames)
         prepareCommands()
         start()
     }
 });
 
-function start(){
+function start() {
 
     sequentialExecution(commands).then(() => {
         console.log('Command sequence terminated ok');
     }).catch((error) => {
         console.error(error)
     })
-    
+
 }
 
 async function sequentialExecution(commands) {

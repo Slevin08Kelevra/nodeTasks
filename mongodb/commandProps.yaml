@@ -1,24 +1,28 @@
 # List of commands and configurations
 
 general_vars:
-  key_file_name: &kname mongoCA.key
+  key_file_name: &kname next/mongoCA.key
   key_passwrd: &kpass 1234qwer
-  ca_crt: &cacrt mongoCA.crt
+  ca_crt: &cacrt next/mongoCA.crt
   replica_size: &repsize 3
-  dir: &wrokdir /home/pablo/certTest
+  dir: /home/pablo/certTest
   awspodkey: &podkey /home/pablo/dumps/firstKey.pem
   awscertloc: &certloc /home/ubuntu/tls/auto
+  pfx_pass: &pfxpass 1234qwer
+  alias_pfx: &aliaspfx mongoaurelio
+  alias_cert: &aliscert mongoaurelio
+  trust_store_name: &truststorename next/mongoTrust.p12
+  trust_store_pass: &truststorepass 1234qwer
+  key_store_pass: &keystorepass 1234qwer
+  key_store_name: &keystorename next/mongoKey.p12
+  sam_mongo_certloc: &sammongocertloc /home/ubuntu/repos/certs
 
 create_certs:
-  - function: getSimpleChildExecutor
-    args: 
-      name: removingFiles
-      cmd: "rm mongo*"
   - function: getSimpleChildExecutor
     cmd_args: [*kpass, *kname]
     args: 
       name: createKey
-      cmd: "openssl genrsa -aes256 -passout pass:%s -out %s 8192"
+      cmd: "openssl genrsa -aes256 -passout pass:%s -out %s 2048" #8192
   - function: getFileChecker
     name_args: [*kname]
     args:
@@ -33,41 +37,100 @@ create_certs:
     node_repeat: true
     args: 
       name: createNodeKey node %i
-      cmd: "openssl req -new -nodes -newkey rsa:4096 -keyout mongo%i.key -out mongo%i.csr -config openssl_ext_node_%i.conf"
+      cmd: "openssl req -new -nodes -newkey rsa:4096 -keyout next/mongo%i.key -out next/mongo%i.csr -config openssl_ext_node_%i.conf"
   - function: getSimpleChildExecutor
     cmd_args: [*cacrt, *kname, *kpass]
     node_repeat: true
     args:
       name: createNodeCrt node %i
-      cmd: "openssl x509 -CA %s -CAkey %s -CAcreateserial -req -days 365 -in mongo%i.csr -out mongo%i.crt -passin pass:%s"
+      cmd: "openssl x509 -CA %s -CAkey %s -CAcreateserial -req -days 365 -in next/mongo%i.csr -out next/mongo%i.crt -passin pass:%s"
   - function: getSimpleChildExecutor
     node_repeat: true
     args:
       name: createNodePem node %i
-      cmd: "cat mongo%i.key mongo%i.crt > mongo%i.pem"
+      cmd: "cat next/mongo%i.key next/mongo%i.crt > next/mongo%i.pem"
   - function: getSimpleChildExecutor
+    cmd_args: [*pfxpass, *aliaspfx]
     node_repeat: true
     args:
       name: createNodePfx node %i
-      cmd: "openssl pkcs12 -inkey mongo%i.key -in mongo%i.crt -export -out mongo%i.pfx -passout pass:1234qwer -name 'lala'"
-  - function: getSimpleChildExecutor
-    cmd_args: [*podkey, *certloc]
-    node_repeat: true
-    args:
-      name: removeCertFiles node %i
-      cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/*.*'"
+      cmd: "openssl pkcs12 -inkey next/mongo%i.key -in next/mongo%i.crt -export -out next/mongo%i.pfx -passout pass:%s -name '%s'"
+  #- function: getSimpleChildExecutor
+  #  cmd_args: [*podkey, *certloc]
+  #  node_repeat: true
+  #  args:
+  #    name: removeCertFiles node %i
+  #    cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/next/*.*'"
   - function: getSimpleChildExecutor
     cmd_args: [*podkey, *certloc]
     node_repeat: true
     args:
       name: uploadPems node %i
-      cmd: "scp -i %s mongo%i.pem ubuntu@%POD_NAME:%s"
+      cmd: "scp -i %s next/mongo%i.pem ubuntu@%POD_NAME:%s/next"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc, *certloc]
+    node_repeat: true
+    args:
+      name: renameRemoteCert node %i
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/next/mongo%i.pem %s/next/mongo.pem'"
   - function: getSimpleChildExecutor
     cmd_args: [*podkey, *cacrt, *certloc]
     node_repeat: true
     args:
       name: uploadCerts node %i
-      cmd: "scp -i %s %s ubuntu@%POD_NAME:%s"
-  
-# keytool -import -alias server -file mongoCA.crt -keystore truststore.jks -storepass truststore -noprompt
+      cmd: "scp -i %s %s ubuntu@%POD_NAME:%s/next"
+  - function: getSimpleChildExecutor
+    cmd_args: [*aliscert, *cacrt, *truststorename, *truststorepass]
+    args:
+      name: createTrustStore
+      cmd: "keytool -import -alias %s -file %s -keystore %s -storepass %s -noprompt"
+  - function: getSimpleChildExecutor
+    cmd_args: [*keystorepass, *keystorename, *pfxpass]
+    args:
+      name: createKeyStore
+      cmd: "keytool -importkeystore -deststorepass %s -srckeystore next/mongo1.pfx -srcstoretype pkcs12 -destkeystore %s -deststoretype pkcs12 -srcstorepass %s"   
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *sammongocertloc]
+    special_node: sam-mongo
+    args:
+      name: uploadKeyStoreAndTrust
+      cmd: "scp -i %s next/*.p12 ubuntu@%POD_NAME:%s/next"
+
+  #moving locals
+  - function: getSimpleChildExecutor
+    args:
+      name: removeLocalBackFiles
+      cmd: "rm -f back/*"
+  - function: getSimpleChildExecutor
+    args:
+      name: localActualToBack
+      cmd: "mv -f actual/* back/"
+  - function: getSimpleChildExecutor
+    args:
+      name: localNextToBack
+      cmd: "mv -f next/* actual/"
+
+  #moving remotes
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc]
+    node_repeat: true
+    args:
+      name: removeBackFiles node %i
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/back/*'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc, *certloc]
+    node_repeat: true
+    args:
+      name: actualToBack  node %i
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/actual/* %s/back/'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *certloc, *certloc]
+    node_repeat: true
+    args:
+      name: nextToActual  node %i
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/next/* %s/actual/'"
+    
+# keytool -import -alias %s -file mongoCA.crt -keystore truststore.jks -storepass truststore -noprompt
 # keytool -importkeystore -deststorepass 1234qwer -srckeystore mongo1.pfx -srcstoretype pkcs12 -destkeystore keystore.jks -deststoretype pkcs12 -srcstorepass 1234qwer
+
+# scp -i /home/pablo/dumps/firstKey.pem mongoTrust.p12 ubuntu@ec2-18-217-186-110.us-east-2.compute.amazonaws.com:/home/ubuntu/repos/certs
