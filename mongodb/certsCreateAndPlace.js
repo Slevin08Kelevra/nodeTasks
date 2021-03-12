@@ -8,24 +8,25 @@ const { MongoClient } = require("mongodb");
 
 var url = ""
 const client = new MongoClient(url, {
-  tlsCAFile: `/home/pablo/certTest/mongo1certs/mongoCA.crt`,
-  tlsCertificateKeyFile: `/home/pablo/certTest/mongo1certs/mongo.pem`,
-  useUnifiedTopology: true
+    tlsCAFile: `/home/pablo/certTest/actual/mongoCA.crt`,
+    tlsCertificateKeyFile: `/home/pablo/certTest/actual/mongo3.pem`,
+    useUnifiedTopology: true
 });
 
 async function run() {
     try {
-      await client.connect();
-      const db = client.db("admin");
-      const result = await db.command({
-        dbStats: 1,
-      });
-      console.log(result);
+        await client.connect();
+        const db = client.db("admin");
+        const result = await db.command({
+            shutdown: 1
+        });
+        console.log(result);
     } finally {
-      await client.close();
+        await client.close();
     }
-  }
-  //run().catch(console.dir);
+}
+run().catch(console.dir);
+
 
 
 var credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
@@ -44,6 +45,30 @@ var ec2 = new AWS.EC2({ region: 'us-east-2' });
 var dnsNames = {}
 
 var funcs = []
+
+funcs.getMongoNodeCmdExecutor = (args) => {
+    let func = async () => {
+        const client = new MongoClient(args.cmd, {
+            tlsCAFile: args.ca,
+            tlsCertificateKeyFile: args.cert,
+            useUnifiedTopology: true
+        });
+        try {
+            await client.connect();
+            const db = client.db("admin");
+            const result = await db.command({
+                shutdown: 1
+            });
+            console.log(result);
+        } catch (err) {
+            console.error(err)
+            throw args.name + ' execution aborted'
+        } finally {
+            await client.close();
+        }
+    }
+    return new command(func)
+}
 
 funcs.getFileChecker = (args) => {
     let func = async () => {
@@ -125,9 +150,9 @@ function prepareCommands() {
                     argsCloned.name = argsCloned.name.replace(/%i/g, index)
                     commands.push(funcs[fn](argsCloned))
                 }
-            } else if (action.special_node){
+            } else if (action.special_node) {
                 let dns = awsData.Reservations.find(res => {
-                    return res.Instances[0].Tags.find(tag => {               
+                    return res.Instances[0].Tags.find(tag => {
                         return tag.Key === "Name"
                     }).Value == action.special_node
                 }).Instances[0].PublicDnsName
@@ -152,7 +177,7 @@ ec2.describeInstances(params, function (err, data) {
     else {
         awsData = data
         data.Reservations.filter(res => {
-            return res.Instances[0].Tags.find(tag => {               
+            return res.Instances[0].Tags.find(tag => {
                 return tag.Key === "Name"
             }).Value.startsWith("mongodb")
         }).forEach(res => {
@@ -162,8 +187,8 @@ ec2.describeInstances(params, function (err, data) {
             dnsNames[key] = res.Instances[0].PublicDnsName
         });
         //console.log(dnsNames)
-        prepareCommands()
-        start()
+        //prepareCommands()
+        //start()
     }
 });
 

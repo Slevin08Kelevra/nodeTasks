@@ -129,6 +129,37 @@ create_certs:
     args:
       name: nextToActual  node %i
       cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/next/* %s/actual/'"
+  
+  # moving remotes sam-mongo
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *sammongocertloc]
+    special_node: sam-mongo
+    args:
+      name: uploadKeyStoreAndTrust
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/back/*'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *sammongocertloc]
+    special_node: sam-mongo
+    args:
+      name: uploadKeyStoreAndTrust
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/actual/* %s/back/'"
+  - function: getSimpleChildExecutor
+    cmd_args: [*podkey, *sammongocertloc]
+    special_node: sam-mongo
+    args:
+      name: uploadKeyStoreAndTrust
+      cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/next/* %s/actual/'"
+
+  #stop mongo nodes
+  - function: getMongoNodeCmdExecutor
+    cmd_args: [*podkey, *sammongocertloc]
+    special_node: sam-mongo
+    args:
+      name: uploadKeyStoreAndTrust
+      cmd: "mongodb://admin:1234qwer@%s:27026?tls=true"
+      ca: "/home/pablo/certTest/actual/mongoCA.crt"
+      cert: "/home/pablo/certTest/actual/mongo3.pem"
+
     
 # keytool -import -alias %s -file mongoCA.crt -keystore truststore.jks -storepass truststore -noprompt
 # keytool -importkeystore -deststorepass 1234qwer -srckeystore mongo1.pfx -srcstoretype pkcs12 -destkeystore keystore.jks -deststoretype pkcs12 -srcstorepass 1234qwer
