@@ -135,30 +135,30 @@ create_certs:
     cmd_args: [*podkey, *sammongocertloc]
     special_node: sam-mongo
     args:
-      name: uploadKeyStoreAndTrust
+      name: removeOldStoreAndTrust
       cmd: "ssh -i %s ubuntu@%POD_NAME 'rm -f %s/back/*'"
   - function: getSimpleChildExecutor
-    cmd_args: [*podkey, *sammongocertloc]
+    cmd_args: [*podkey, *sammongocertloc, *sammongocertloc]
     special_node: sam-mongo
     args:
-      name: uploadKeyStoreAndTrust
+      name: moveToBackKeyStoreAndTrust
       cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/actual/* %s/back/'"
   - function: getSimpleChildExecutor
-    cmd_args: [*podkey, *sammongocertloc]
+    cmd_args: [*podkey, *sammongocertloc, *sammongocertloc]
     special_node: sam-mongo
     args:
-      name: uploadKeyStoreAndTrust
+      name: moveNextToActualStoreAndTrust
       cmd: "ssh -i %s ubuntu@%POD_NAME 'mv -f %s/next/* %s/actual/'"
 
   #stop mongo nodes
-  - function: getMongoNodeCmdExecutor
-    cmd_args: [*podkey, *sammongocertloc]
-    special_node: sam-mongo
-    args:
-      name: uploadKeyStoreAndTrust
-      cmd: "mongodb://admin:1234qwer@%s:27026?tls=true"
-      ca: "/home/pablo/certTest/actual/mongoCA.crt"
-      cert: "/home/pablo/certTest/actual/mongo3.pem"
+  #- function: getMongoNodeCmdExecutor
+  #  cmd_args: [*podkey, *sammongocertloc]
+  #  special_node: sam-mongo
+  #  args:
+  #    name: uploadKeyStoreAndTrust
+  #    cmd: "mongodb://admin:1234qwer@%s:27026?tls=true"
+  #    ca: "/home/pablo/certTest/actual/mongoCA.crt"
+  #    cert: "/home/pablo/certTest/actual/mongo3.pem"
 
     
 # keytool -import -alias %s -file mongoCA.crt -keystore truststore.jks -storepass truststore -noprompt

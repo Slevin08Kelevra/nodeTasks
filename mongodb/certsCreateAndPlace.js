@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
 var AWS = require('aws-sdk');
 const { MongoClient } = require("mongodb");
 
-var url = ""
+var url = "mongodb://admin:1234qwer@ec2-3-17-23-64.us-east-2.compute.amazonaws.com:27026?tls=true"
 const client = new MongoClient(url, {
     tlsCAFile: `/home/pablo/certTest/actual/mongoCA.crt`,
     tlsCertificateKeyFile: `/home/pablo/certTest/actual/mongo3.pem`,
@@ -18,14 +18,17 @@ async function run() {
         await client.connect();
         const db = client.db("admin");
         const result = await db.command({
-            shutdown: 1
+            shutdown: 1,
+            force: false,
+            timeoutSecs: 3,
+            comment: 'Shuting down for maintenance'
         });
         console.log(result);
     } finally {
         await client.close();
     }
 }
-run().catch(console.dir);
+//run().catch(console.dir);
 
 
 
@@ -187,10 +190,29 @@ ec2.describeInstances(params, function (err, data) {
             dnsNames[key] = res.Instances[0].PublicDnsName
         });
         //console.log(dnsNames)
-        //prepareCommands()
-        //start()
+        //createExtFilesFromTemplates()
+        prepareCommands()
+        start()
     }
 });
+
+function createExtFilesFromTemplates(){
+    for (i = 1; i <= Object.keys(dnsNames).length; i++) {
+        let dns = dnsNames[i]
+        let index = i
+        fs.readFile(__dirname + "/openssl_ext_node_temp.conf", 'utf8', function (err,data) {
+            if (err) {
+              return console.log(err);
+            }
+            var result = data.replace(/NODE_URL/g, dns);
+            let destFile = props.general_vars.dir + "/" + `openssl_ext_node_${index}.conf`
+            console.log(destFile)
+            fs.writeFile(destFile, result, 'utf8', function (err) {
+               if (err) return console.log(err);
+            });
+          });
+      }
+}
 
 function start() {
 
