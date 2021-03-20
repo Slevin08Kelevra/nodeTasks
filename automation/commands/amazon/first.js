@@ -2,21 +2,12 @@ const awsUtils = require('./../../awsUtils.js')
 
 let amazon = {
 
-    'test': function () {
+    'test': async ()=> {
         console.log("arrived")
         return "saranga"
     },
-    'ignite.servers': function () {
-        console.log("arrived")
-        return "saranga"
-    },
-    'servers.shutdwon': function () {
-        console.log("arrived")
-        return "saranga"
-    },
-    'servers.status': async () => {
-
-        data = await awsUtils.describeFiltered()
+    'ignite.servers': async () => {
+        data = await awsUtils.startAllInstances()
 
         let status = []
         data.forEach((inst) => {
@@ -24,6 +15,21 @@ let amazon = {
         })
  
         return status
+    },
+    'servers.shutdwon': async () => {
+        data = await awsUtils.shtudownAllInstances()
+
+        return data.map((inst) => {
+            return `${inst.id} -> ${inst.status}`
+        })
+    },
+    'servers.status': async () => {
+
+        data = await awsUtils.describeFiltered()
+
+        return data.map((inst) => {
+            return `${inst.id} -> ${inst.status}`
+        })
     }
 
 }

@@ -33,8 +33,8 @@ awsUtils.describeAll = async () => {
 
 awsUtils.describeFiltered = async () => {
     let data = await awsUtils.describeAll()
-    let instances = []
-    data.Reservations.forEach(res => {
+
+    return data.Reservations.map(res => {
         let instance = {}
         instance.id = res.Instances[0].InstanceId
         instance.privateIp = res.Instances[0].PrivateIpAddress
@@ -44,12 +44,66 @@ awsUtils.describeFiltered = async () => {
         instance.name = res.Instances[0].Tags.find(tag => {
             return tag.Key === "Name"
         }).Value
-
-        instances.push(instance)
+        return instance
     })
-    
-    return instances
 }
 
+awsUtils.shtudownInstancesByIdList = async (idList) => {
+    var params = {
+        InstanceIds: idList
+    };
+    return new Promise((resolve, reject) => {
+        ec2.stopInstances(params, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                reject(err)
+            }
+            else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+awsUtils.shtudownAllInstances = async () => {
+    let instances = await awsUtils.describeFiltered()
+    let idList = instances.map(instance => instance.id)
+    let data = await awsUtils.shtudownInstancesByIdList(idList)
+    return data.StoppingInstances.map(inst => {
+        let idStatus = {}
+        idStatus.id = inst.InstanceId
+        idStatus.status = inst.CurrentState.Name
+        return idStatus 
+    })
+}
+
+awsUtils.startInstancesByIdList = async (idList) => {
+    var params = {
+        InstanceIds: idList
+    };
+    return new Promise((resolve, reject) => {
+        ec2.startInstances(params, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                reject(err)
+            }
+            else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+awsUtils.startAllInstances = async () => {
+    let instances = await awsUtils.describeFiltered()
+    let idList = instances.map(instance => instance.id)
+    let data = await awsUtils.startInstancesByIdList(idList)
+    return data.StartingInstances.map(inst => {
+        let idStatus = {}
+        idStatus.id = inst.InstanceId
+        idStatus.status = inst.CurrentState.Name
+        return idStatus 
+    })
+}
 
 module.exports = awsUtils
