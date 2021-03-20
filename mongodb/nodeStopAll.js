@@ -30,16 +30,19 @@ ec2.describeInstances(params, function (err, data) {
             return name.startsWith("mongodb") && name  !== "mongodb4"
         }).forEach(res => {
             console.log(res.Instances[0].InstanceId)
-            stopNode(res.Instances[0].PublicDnsName)
+            let index = res.Instances[0].Tags.find(tag => {
+                return tag.Key.toLowerCase() === "index"
+            }).Value
+            stopNode(`srv${index}.mongoaurelio.xyz`)
         });
     }
 });
 
 async function stopNode(dns) {
-    let url = `mongodb://admin:1234qwer@${dns}:27026/admin?tls=true&tlsAllowInvalidHostnames=true`
+    let url = `mongodb://admin:1234qwer@${dns}:27026/admin?tls=true&authMode=scram-sha1`
     let client = new MongoClient(url, {
         tlsCAFile: `/home/pablo/certTest/actual/mongoCA.crt`,
-        tlsCertificateKeyFile: `/home/pablo/certTest/actual/mongo3.pem`,
+        tlsCertificateKeyFile: `/home/pablo/certTest/actual/mongo1.pem`,
         useUnifiedTopology: true
     });
     try {

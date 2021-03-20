@@ -33,6 +33,14 @@ async function start(){
                 
                 let result = await changeHost(name, ip)
                 console.log(result)
+
+                if (name.startsWith("mongodb")){
+                    let index = res.Instances[0].Tags.find(tag => {
+                        return tag.Key.toLowerCase() === "index"
+                    }).Value
+                    let result = await changeHost(`srv${index}.mongoaurelio.xyz`, ip)
+                    console.log(result)
+                }
             }
         }
     });
