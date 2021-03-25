@@ -1,8 +1,9 @@
-var AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
+const hostile = require('hostile')
 
-var credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
+const credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
 AWS.config.credentials = credentials;
-var params = {
+const params = {
     Filters: [
         {
             Name: "instance-type",
@@ -13,7 +14,7 @@ var params = {
     ]
 };
 
-var ec2 = new AWS.EC2({ region: 'us-east-2' });
+const ec2 = new AWS.EC2({ region: 'us-east-2' });
 
 const awsUtils = []
 
@@ -44,12 +45,15 @@ awsUtils.describeFiltered = async () => {
         instance.name = res.Instances[0].Tags.find(tag => {
             return tag.Key === "Name"
         }).Value
+        instance.index = res.Instances[0].Tags.find(tag => {
+            return tag.Key.toLowerCase() === "index"
+        })?.Value 
         return instance
     })
 }
 
 awsUtils.shtudownInstancesByIdList = async (idList) => {
-    var params = {
+    let params = {
         InstanceIds: idList
     };
     return new Promise((resolve, reject) => {
@@ -73,12 +77,12 @@ awsUtils.shtudownAllInstances = async () => {
         let idStatus = {}
         idStatus.id = inst.InstanceId
         idStatus.status = inst.CurrentState.Name
-        return idStatus 
+        return idStatus
     })
 }
 
 awsUtils.startInstancesByIdList = async (idList) => {
-    var params = {
+    let params = {
         InstanceIds: idList
     };
     return new Promise((resolve, reject) => {
@@ -102,8 +106,24 @@ awsUtils.startAllInstances = async () => {
         let idStatus = {}
         idStatus.id = inst.InstanceId
         idStatus.status = inst.CurrentState.Name
-        return idStatus 
+        return idStatus
     })
+}
+
+ awsUtils.waitStatus = {'run': 'instanceRunning'}
+ awsUtils.waitFor = async (status, idList, callback) => {
+    let params = {
+        InstanceIds: idList
+    };
+    ec2.waitFor(status, params, function (err, data) {
+        if (err) {
+            console.log(err, err.stack);
+        }
+        else {
+            console.log(`All instances in ${status}`);
+            callback()
+        }           
+    });
 }
 
 module.exports = awsUtils

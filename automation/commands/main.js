@@ -1,8 +1,8 @@
 const path = require("path")
 const fs = require("fs");
 
-let myPath = path.join(__dirname, "");
-let base = {};
+var myPath = path.join(__dirname, "");
+var base = {};
 base.phraseKeyMap = {}
 fs.readdirSync(myPath).forEach(function (folder) {
     let subDir = path.resolve(myPath, folder)

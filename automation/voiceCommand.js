@@ -1,6 +1,6 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
 const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
@@ -17,6 +17,7 @@ const toWords = new ToWords({
 
 app.use(bodyParser.json());
 
+var execEnabled = true
 app.post('/send', async (req, res, next) => {
 
     let voiceCmd = req.body.message.toLowerCase()
@@ -25,21 +26,33 @@ app.post('/send', async (req, res, next) => {
     })
     console.log(voiceCmd)
 
-
+    
     let cmdToRun = 'phraseNotFound'
     Object.keys(phraseKeyMap).forEach(function (phrase) {
         var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
-        if (similarity > 0.80) {
+        if (similarity > 0.85) {
             console.log(similarity);
             cmdToRun = phraseKeyMap[phrase]
         }
     });
-
+    
     let response = {}
-    response.status = await (commands[cmdToRun] || commands['phrase.not.found'])()
+    if (execEnabled){
+        execEnabled = false
+        response.status = await (commands[cmdToRun] || commands['phrase.not.found'])()
+        delayAndEnableExec()
+    } else {
+        response.status = "repeated, repetition not allowed"
+    }
 
     res.json(response)
 })
+
+async function delayAndEnableExec(){
+    setTimeout(function(){
+        execEnabled = true
+    },5000);
+};
 
 async function test() {
     console.log("async called")
@@ -47,8 +60,8 @@ async function test() {
 
 var server = app.listen(8095, function () {
 
-    var host = server.address().address
-    var port = server.address().port
+    let host = server.address().address
+    let port = server.address().port
 
     console.log("Example app listening at http://%s:%s", host, port)
 
