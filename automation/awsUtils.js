@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const hostile = require('hostile')
+const props = require('./props.js')
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: 'default' });
 AWS.config.credentials = credentials;
@@ -32,10 +33,10 @@ awsUtils.describeAll = async () => {
     })
 }
 
-awsUtils.describeFiltered = async () => {
+awsUtils.describeFiltered = async (filterFunc) => {
     let data = await awsUtils.describeAll()
 
-    return data.Reservations.map(res => {
+    let filteredList = data.Reservations.map(res => {
         let instance = {}
         instance.id = res.Instances[0].InstanceId
         instance.privateIp = res.Instances[0].PrivateIpAddress
@@ -48,8 +49,15 @@ awsUtils.describeFiltered = async () => {
         instance.index = res.Instances[0].Tags.find(tag => {
             return tag.Key.toLowerCase() === "index"
         })?.Value 
+        instance.mongoHost = `srv${instance.index}.${props.mongo.domain}`
         return instance
     })
+
+    if (filterFunc){
+        filteredList = filteredList.filter(filterFunc)
+    }
+
+    return filteredList
 }
 
 awsUtils.shtudownInstancesByIdList = async (idList) => {

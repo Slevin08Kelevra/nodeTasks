@@ -1,2 +1,13 @@
-mongo
+mongo:
   domain: mongoaurelio.xyz
+  start_command: '%s --auth --dbpath %s --port %s --bind_ip %s --tlsMode requireTLS --tlsCertificateKeyFile %s --tlsCAFile %s --clusterAuthMode x509 --tlsClusterFile %s --replSet rs0 --fork --logpath %s'
+  start_params:
+    mongod_path: /home/ubuntu/.mongodb/versions/mongodb-current/bin/mongod
+    node_path: /home/ubuntu/mongo/auto
+    my_port: 27026
+    my_host: SERVER_NAME
+    pem_path: /home/ubuntu/tls/auto/actual/mongo.pem
+    ca_path: /home/ubuntu/tls/auto/actual/mongoCA.crt
+    pem_path2: /home/ubuntu/tls/auto/actual/mongo.pem
+    log_to: /home/ubuntu/logs/mongo.log
+  kill_command: sudo kill $(ps aux | grep mongod | grep -v 'grep' | awk '{print $2}')
