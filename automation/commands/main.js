@@ -25,6 +25,7 @@ function extend(obj, src, folder) {
         base.phraseKeyMap[`${folder} ${spreadKey}`] = key
         obj[key] = src[key]; 
     });
+    
     return obj;
 }
 

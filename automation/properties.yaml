@@ -1,5 +1,9 @@
 mongo:
   domain: mongoaurelio.xyz
+  user: admin
+  pass: 1234qwer
+  port: 27026
+  replica_id: rs0
   start_command: '%s --auth --dbpath %s --port %s --bind_ip %s --tlsMode requireTLS --tlsCertificateKeyFile %s --tlsCAFile %s --clusterAuthMode x509 --tlsClusterFile %s --replSet rs0 --fork --logpath %s'
   start_params:
     mongod_path: /home/ubuntu/.mongodb/versions/mongodb-current/bin/mongod

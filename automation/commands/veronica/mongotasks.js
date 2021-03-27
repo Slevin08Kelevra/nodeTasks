@@ -3,18 +3,14 @@ const mongoUtils = require('./../../mongoUtils.js')
 const gralUtils = require('./../../gralUtils.js')
 const props = require('./../../props.js')
 
-function parse(str) {
-    var args = [].slice.call(arguments, 1),
-        i = 0;
-    return str.replace(/%s/g, () => args[i++]);
+const simpleFilter = (instance)=>{
+    return instance.index != undefined && instance.index != '4'
 }
 
 const mongo = {
     'ignite replicas': async () => {
 
-        let dataFiltered = await awsUtils.describeFiltered((instance)=>{
-            return instance.index != undefined && instance.index != '4'
-        })
+        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
         let paramArray = Object.values(props.mongo.start_params);
         let i = 0
         let cmd = props.mongo.start_command.replace(/%s/g, () => paramArray[i++]);
@@ -26,19 +22,29 @@ const mongo = {
         });
 
         gralUtils.executeInRemote(hosts, cmds)
-        
-        
-
-        
-        //mongoUtils.test()
+    
         return "node ignited"
     },
-    'replicas status': async () => {
-        console.log("arrived")
-        return "node status"
+    'replica set report': async () => {
+        
+        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
+        let statusList = await mongoUtils.showReplicasStatus(dataFiltered)
+
+        return statusList
     },
-    'replicas shutdown': async () => {
-        console.log("arrived")
+    'replica set shutdown': async () => {
+        
+        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
+        let cmd = props.mongo.kill_command
+
+        let hosts = []
+        let cmds = [cmd]
+        dataFiltered.forEach(instance => {
+            hosts.push(instance.dns)
+        });
+
+        gralUtils.executeInRemote(hosts, cmds)
+
         return "node shutdown"
     }
 }
