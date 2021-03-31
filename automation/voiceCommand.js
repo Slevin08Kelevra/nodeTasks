@@ -20,27 +20,49 @@ app.use(bodyParser.json());
 var execEnabled = true
 app.post('/send', async (req, res, next) => {
 
-    let voiceCmd = req.body.message.toLowerCase()
-    voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number)=>{
-        return toWords.convert(Number(number))
+    let possibleCmds = req.body.possibleMessages
+    let fixedCmds = possibleCmds.map((cmd)=>{
+        let voiceCmd = cmd.toLowerCase()
+        voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number)=>{
+            return toWords.convert(Number(number))
+        })
+        console.log(voiceCmd)
+        return voiceCmd
     })
-    console.log(voiceCmd)
+    
 
     
-    let cmdToRun = 'phraseNotFound'
+    let cmdToRun = ['phrase.not.found']
+    let index = 0
     Object.keys(phraseKeyMap).forEach(function (phrase) {
-        var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
-        if (similarity > 0.85) {
-            console.log(similarity);
-            cmdToRun = phraseKeyMap[phrase]
-        }
+        fixedCmds.some(voiceCmd => {
+            var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
+            if (similarity > 0.85) {
+                console.log(similarity);
+                cmdToRun[index++] = phraseKeyMap[phrase]
+                return true
+            }
+        })
     });
+
+    if (cmdToRun.length > 1){
+        console.log('repeated commands')
+        cmdToRun.forEach((cmd)=>{
+            console.log(cmd)
+        })
+        cmdToRun = ['general.phrase.repeated']
+    }
     
     let response = {}
     if (execEnabled){
         execEnabled = false
-        response.status = await (commands[cmdToRun] || commands['phrase.not.found'])()
+        response.status = await (commands[cmdToRun[0]] || commands['general.phrase.not.found'])()
         delayAndEnableExec()
+        if (cmdToRun[0]){
+            response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
+        } else {
+            response.appliedCmd = 'General phrase not found'
+        }
     } else {
         response.status = "repeated, repetition not allowed"
     }

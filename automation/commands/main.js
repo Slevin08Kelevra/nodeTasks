@@ -22,8 +22,9 @@ function extend(obj, src, folder) {
     
     Object.keys(src).forEach(function (key) { 
         let spreadKey = key.replace(/\./g, ' ')
-        base.phraseKeyMap[`${folder} ${spreadKey}`] = key
-        obj[key] = src[key]; 
+        let fixedKey = `${folder}.${key}`
+        base.phraseKeyMap[`${folder} ${spreadKey}`] = fixedKey
+        obj[fixedKey] = src[key]; 
     });
     
     return obj;
