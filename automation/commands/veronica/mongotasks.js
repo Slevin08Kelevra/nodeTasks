@@ -23,12 +23,14 @@ const mongo = {
 
         gralUtils.executeInRemote(hosts, cmds)
     
-        return "node ignited"
+        return ["Replica set igniting"]
     },
     'replica set report': async () => {
         
         let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
         let statusList = await mongoUtils.showReplicasStatus(dataFiltered)
+
+        console.log(statusList)
 
         return statusList
     },
@@ -45,7 +47,7 @@ const mongo = {
 
         gralUtils.executeInRemote(hosts, cmds)
 
-        return "node shutdown"
+        return ["Replica set Shutting down"]
     }
 }
 

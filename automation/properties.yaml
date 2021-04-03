@@ -15,3 +15,12 @@ mongo:
     pem_path2: /home/ubuntu/tls/auto/actual/mongo.pem
     log_to: /home/ubuntu/logs/mongo.log
   kill_command: sudo kill $(ps aux | grep mongod | grep -v 'grep' | awk '{print $2}')
+  
+
+aws:
+  user: ubuntu
+  key: /home/pablo/dumps/firstKey.pem
+  port: 22
+  remove_old_hosts: sudo sed -i '/srv[[:digit:]]\./d' /etc/hosts
+  add_mongo_host_title: sudo sed -i -e '$a/# Mongo hosts/' /etc/hosts
+  add_new_host: sudo sed -i -e '$a%s %s' /etc/hosts

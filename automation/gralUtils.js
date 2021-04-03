@@ -1,13 +1,14 @@
 const rexec = require('remote-exec');
 const  fs = require('fs')
+const props = require('./props.js')
 
 const gralUtils = []
 
 
 var connection_options = {
-    port: 22,
-    username: 'ubuntu',
-    privateKey: fs.readFileSync('/home/pablo/dumps/firstKey.pem')
+    port: props.aws.port,
+    username: props.aws.user,
+    privateKey: fs.readFileSync(props.aws.key)
 };
 
 gralUtils.executeInRemote = async (hosts, cmds) => {

@@ -190,15 +190,29 @@ ec2.describeInstances(params, function (err, data) {
             dnsNames[key] = res.Instances[0].PublicDnsName
         });
         //console.log(dnsNames)
-        //createExtFilesFromTemplates()
+        createExtFilesFromTemplates()
         prepareCommands()
         start()
     }
 });
 
 function createExtFilesFromTemplates(){
+
+    let domain = props.general_vars.domain
+    fs.readFile(__dirname + "/openssl_ext_temp.conf", 'utf8', function (err,data) {
+        if (err) {
+          return console.log(err);
+        }
+        var result = data.replace(/DOMAIN_URL/g, domain);
+        let destFile = props.general_vars.dir + "/" + `openssl_ext.conf`
+        console.log(destFile)
+        fs.writeFile(destFile, result, 'utf8', function (err) {
+           if (err) return console.log(err);
+        });
+      });
+
     for (i = 1; i <= Object.keys(dnsNames).length; i++) {
-        let dns = dnsNames[i]
+        let dns = `srv${i}.${props.general_vars.domain}`//dnsNames[i]
         let index = i
         fs.readFile(__dirname + "/openssl_ext_node_temp.conf", 'utf8', function (err,data) {
             if (err) {

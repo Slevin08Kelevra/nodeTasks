@@ -1,5 +1,11 @@
 const awsUtils = require('./../../awsUtils.js')
 const hostile = require('hostile')
+const gralUtils = require('./../../gralUtils.js')
+const props = require('./../../props.js')
+
+const simpleFilter = (instance)=>{
+    return instance.index != undefined && instance.index != '4'
+}
 
 const amazon = {
 
@@ -39,10 +45,31 @@ const amazon = {
             return `${inst.id} -> ${inst.status}`
         })
     },
-    'hosts fix': async () => {
+    'fix local hosts': async () => {
         let instancesList = await awsUtils.describeFiltered()
         let fixHosts = getFixHostsFunc(instancesList)()
-        return 'fixed'
+        return ['fixing hosts']
+    },
+    'fix remote hosts': async () => {
+
+        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
+
+        let hosts = []
+        let cmds = [props.aws.remove_old_hosts]
+        //let cmd = props.add_mongo_host_title
+        //cmds.push(cmd)
+
+        dataFiltered.forEach(instance => {
+            hosts.push(instance.dns)
+            
+            let i = 0, params = [instance.privateIp, instance.mongoHost]
+            let cmd = props.aws.add_new_host.replace(/%s/g, () => params[i++]);
+            cmds.push(cmd)
+        });
+
+        gralUtils.executeInRemote(hosts, cmds)
+    
+        return ["Fixing remote hosts"]
     }
 
 }
@@ -61,7 +88,7 @@ function getFixHostsFunc() {
             if (host.startsWith("mongodb")) {
 
                 let index = inst.index
-                let mongoHost = `srv${index}.mongoaurelio.xyz`
+                let mongoHost = `srv${index}.${props.mongo.doamin}`
 
                 result = await changeHost(mongoHost, ip)
                 console.log(result)
