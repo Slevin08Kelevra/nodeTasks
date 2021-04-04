@@ -1,3 +1,5 @@
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -5,6 +7,15 @@ const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
+
+var privateKey  = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
+var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
+var options = {
+    key: privateKey,
+    cert: certificate
+};
+var server = https.createServer(options, app)
+
 
 const toWords = new ToWords({
     localeCode: 'en-IN',
@@ -80,7 +91,7 @@ async function test() {
     console.log("async called")
 }
 
-var server = app.listen(8095, function () {
+server.listen(8095, function () {
 
     let host = server.address().address
     let port = server.address().port

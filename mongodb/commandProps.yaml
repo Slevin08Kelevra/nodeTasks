@@ -16,7 +16,7 @@ general_vars:
   key_store_pass: &keystorepass 1234qwer
   key_store_name: &keystorename next/mongoKey.p12
   sam_mongo_certloc: &sammongocertloc /home/ubuntu/repos/certs
-  domain: mongoaurelio.xyz
+  domain: pablitoclavounclavito.xyz
 
 create_certs:
   - function: getSimpleChildExecutor

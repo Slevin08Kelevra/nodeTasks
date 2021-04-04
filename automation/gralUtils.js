@@ -1,6 +1,9 @@
 const rexec = require('remote-exec');
 const  fs = require('fs')
 const props = require('./props.js')
+const { exec } = require('child_process');
+const { promisify } = require('util');
+const execAsync = promisify(exec);
 
 const gralUtils = []
 
@@ -19,6 +22,16 @@ gralUtils.executeInRemote = async (hosts, cmds) => {
             console.log('Command execution ok');
         }
     });
+}
+
+gralUtils.executeInLocal = async (cmd) => {
+    try {
+        await execAsync(cmd)
+    } catch (e) {
+        console.error(e.message.trim());
+        throw new Error('Excecution problem')
+    }
+    console.log(`Command: (${cmd}) -> OK`)
 }
 
 module.exports = gralUtils

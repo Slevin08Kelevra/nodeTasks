@@ -1,5 +1,5 @@
 mongo:
-  domain: mongoaurelio.xyz
+  domain: pablitoclavounclavito.xyz
   user: admin
   pass: 1234qwer
   port: 27026
@@ -22,5 +22,6 @@ aws:
   key: /home/pablo/dumps/firstKey.pem
   port: 22
   remove_old_hosts: sudo sed -i '/srv[[:digit:]]\./d' /etc/hosts
+  remove_my_local_hosts: sudo sed -i '/# My hosts:/,$d' /etc/hosts
   add_mongo_host_title: sudo sed -i -e '$a/# Mongo hosts/' /etc/hosts
   add_new_host: sudo sed -i -e '$a%s %s' /etc/hosts
