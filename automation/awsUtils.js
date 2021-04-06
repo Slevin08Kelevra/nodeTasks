@@ -34,7 +34,13 @@ awsUtils.describeAll = async () => {
 }
 
 awsUtils.describeFiltered = async (filterFunc) => {
-    let data = await awsUtils.describeAll()
+    
+    let data
+    try {
+        data = await awsUtils.describeAll()
+    } catch (error) {
+        throw error
+    }
 
     let filteredList = data.Reservations.map(res => {
         let instance = {}

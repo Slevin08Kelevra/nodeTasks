@@ -8,7 +8,7 @@ const simpleFilter = (instance)=>{
 }
 
 const mongo = {
-    'ignite replicas': async () => {
+    'ignite.replicas': async () => {
 
         let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
         let paramArray = Object.values(props.mongo.start_params);
@@ -25,16 +25,19 @@ const mongo = {
     
         return ["Replica set igniting"]
     },
-    'replica set report': async () => {
+    'replica.set.report': async () => {
         
-        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
-        let statusList = await mongoUtils.showReplicasStatus(dataFiltered)
-
-        console.log(statusList)
+        let statusList
+        try {
+            let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
+            statusList = await mongoUtils.showReplicasStatus(dataFiltered)
+        } catch (error) {
+            statusList = [error.message]
+        }
 
         return statusList
     },
-    'replica set shutdown': async () => {
+    'replica.set.shutdown': async () => {
         
         let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
         let cmd = props.mongo.kill_command
@@ -48,6 +51,17 @@ const mongo = {
         gralUtils.executeInRemote(hosts, cmds)
 
         return ["Replica set Shutting down"]
+    },
+    'replica.set.update.configuration': async () => {
+
+        let dataFiltered = await awsUtils.describeFiltered(simpleFilter)
+        let statusList = await mongoUtils.replicaSetReconf(dataFiltered)
+
+        console.log(statusList)
+
+        return statusList
+
+        return ["Updating configuration"]
     }
 }
 

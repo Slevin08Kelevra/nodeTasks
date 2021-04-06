@@ -14,9 +14,20 @@ mongo:
     ca_path: /home/ubuntu/tls/auto/actual/mongoCA.crt
     pem_path2: /home/ubuntu/tls/auto/actual/mongo.pem
     log_to: /home/ubuntu/logs/mongo.log
+  start_command_basic: '%s --dbpath %s --port %s --bind_ip %s --fork --logpath %s'
+  start_params_basic:
+    mongod_path: /home/ubuntu/.mongodb/versions/mongodb-current/bin/mongod
+    node_path: /home/ubuntu/mongo/auto
+    my_port: 27026
+    my_host: SERVER_NAME
+    log_to: /home/ubuntu/logs/mongo.log
+  change_replica_config_steps:
+    one: use local
+    two: 'cfg = db.system.replset.findOne( { "_id": "rs0" } )'
+    three: 'cfg.members[0].host = "srv1.pablitoclavounclavito.xyz:27026"'
+    four: 'db.system.replset.update( { "_id": "rs0" } , cfg )'
   kill_command: sudo kill $(ps aux | grep mongod | grep -v 'grep' | awk '{print $2}')
   
-
 aws:
   user: ubuntu
   key: /home/pablo/dumps/firstKey.pem

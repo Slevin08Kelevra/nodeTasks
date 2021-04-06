@@ -1,18 +1,8 @@
 var moment = require('moment');
+const random = require('random');
+const { startAllReplicas } = require('./mongoUtils');
 
-console.log(moment().week())
-console.log(moment().date())
-console.log(moment().dayOfYear())
-
-
-
-console.log(moment().hour())
-
-console.log(moment().year() - 2000)
-
-console.log(moment().format('D'))
-
-let stategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9, 9, 9, 9, 9, 6], 
+const strategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9, 9, 9, 9, 9, 6], 
 [4, 6, 1, 1, 2, 5], [2, 5, 7, 5, 3, 9], [5, 5, 5, 8, 9, 6], [6, 7, 2, 9, 8, 9], [9, 2, 7, 6, 4, 3], 
 [9, 3, 9, 2, 3, 4], [4, 1, 2, 3, 3, 4], [4, 4, 7, 5, 9, 8], [1, 6, 6, 6, 8, 2], [5, 9, 5, 7, 9, 4], 
 [1, 5, 9, 8, 5, 8], [8, 5, 4, 2, 8, 2], [9, 7, 7, 1, 9, 8], [4, 7, 7, 4, 6, 5], [4, 7, 8, 8, 6, 1], 
@@ -33,4 +23,26 @@ let stategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9, 9
 [4, 7, 1, 4, 7, 1], [5, 5, 4, 3, 9, 9], [7, 3, 4, 5, 7, 7], [9, 4, 5, 8, 4, 8], [7, 4, 8, 8, 7, 1], 
 [1, 9, 1, 3, 3, 2], [1, 1, 6, 7, 1, 8], [1, 2, 7, 1, 1, 3], [9, 9, 5, 3, 2, 4], [3, 2, 6, 3, 7, 6], 
 [7, 6, 2, 1, 2, 4]]
-console.log(stategy[99])
+
+let hour = moment().hour()
+let minute = moment().minute()
+let day = moment().format('D')
+let month = moment().format('M')
+let year = moment().year() - 2000
+let dayOfYear = moment().dayOfYear()
+
+let ran = random.int((min = 0), (max = 99))
+
+let card = strategy[ran]
+
+let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
+
+console.log(result-card[0]-card[2]-card[5])
+
+
+
+console.log("random " + ran)
+
+//console.log(strategy[19])
+//console.log(strategy[75])
+

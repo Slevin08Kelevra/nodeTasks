@@ -15,11 +15,36 @@ mongoUtils.stopAllReplicas = async (mongoInstances) => {
 
 }
 
+mongoUtils.replicaSetReconf = async (mongoInstances) => {
+    let url = prepareUrl(mongoInstances)
+    let statusList = await executeCommandOnMongo(url, { replSetGetStatus: 1 })
+    return statusList
+}
+
 mongoUtils.showReplicasStatus = async (mongoInstances) => {
 
     let url = prepareUrl(mongoInstances)
-    let statusList = await executeCommandOnMongo(url, {replSetGetStatus: 1})
-    return statusList
+
+    let doAndCheckCmds = []
+    let doAndCheckCmd = {
+        do: () => { return { replSetGetStatus: 1 } },
+        check: (result) => {
+            if (!result) {
+                throw new Error('Error: replSetGetStatus is empty')
+            }
+        }
+    }
+    doAndCheckCmds.push(doAndCheckCmd)
+
+    let result = await executeCommandOnMongo(url, doAndCheckCmds, true)
+    return result.members.map((member) => {
+        let health = (member.health === 1) ? 'OK' : 'KO'
+        let match = member.name.match(/^(?<domain>[A-Za-z0-9-]{1,50}\.[A-Za-z0-9-]{1,50}\.[A-Za-z]{2,6})/)
+        let host = match.groups.domain
+        let stateStr = member.stateStr
+        return `${host} ${stateStr} ${health}`
+
+    });
 }
 
 const urlTemplate = 'mongodb://%s:%s@%s/admin?replicaSet=%s&tls=true'
@@ -33,32 +58,34 @@ function prepareUrl(mongoInstances) {
     return urlTemplate.replace(/%s/g, () => params[i++]);
 }
 
-async function executeCommandOnMongo(url, command) {
+async function executeCommandOnMongo(url, doAndCheckCmds, secure) {
 
-    let statusList = []
-    let client = new MongoClient(url, {
+    let result = []
+    let client
+    let secureClient = new MongoClient(url, {
         tlsCAFile: `/home/pablo/certTest/actual/mongoCA.crt`,
         tlsCertificateKeyFile: `/home/pablo/certTest/actual/mongo1.pem`,
         useUnifiedTopology: true
     });
+    let insecureClient = new MongoClient(url, {
+        useUnifiedTopology: true
+    });
+    client = (secure)?secureClient:insecureClient
     try {
         await client.connect();
-        const db = client.db("admin");
-        const result = await db.command(command);
-        result.members.forEach((member)=>{
-           let health = (member.health === 1)?'OK':'KO'
-           let match = member.name.match(/^(?<domain>[A-Za-z0-9-]{1,50}\.[A-Za-z0-9-]{1,50}\.[A-Za-z]{2,6})/) 
-           let host = match.groups.domain
-           let stateStr = member.stateStr
-           statusList.push(`${host} ${stateStr} ${health}`)
-           
-        });
+        let db = client.db("admin");
+        for (let doAndCheckCmd of doAndCheckCmds) {
+            result = await db.command(doAndCheckCmd.do());
+            doAndCheckCmd.check(result)
+        } 
+
     } catch (err) {
         console.log(err)
+        throw err
     } finally {
         await client.close();
     }
-    return statusList
+    return result
 }
 
 module.exports = mongoUtils
