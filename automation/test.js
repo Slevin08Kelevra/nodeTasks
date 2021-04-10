@@ -1,4 +1,4 @@
-var moment = require('moment');
+const moment = require('moment');
 const random = require('random');
 const { startAllReplicas } = require('./mongoUtils');
 
@@ -26,8 +26,8 @@ const strategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9
 
 let hour = moment().hour()
 let minute = moment().minute()
-let day = moment().format('D')
-let month = moment().format('M')
+let day = new Number(moment().format('D'))
+let month = new Number(moment().format('M'))
 let year = moment().year() - 2000
 let dayOfYear = moment().dayOfYear()
 
@@ -37,7 +37,19 @@ let card = strategy[ran]
 
 let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
 
-console.log(result-card[0]-card[2]-card[5])
+let parcial = result-card[0]-card[2]-card[5]
+
+let ranString = ran.toString()
+let pre, post
+if (ranString.length == 1){
+   pre = 'H'
+   post = ranString
+} else {
+    let splited = ranString.split('')
+    pre = splited[0]
+    post = splited[1]
+}
+console.log(pre + parcial.toString().replace(/0/g, 'X') + post)
 
 
 
