@@ -1,4 +1,5 @@
 const https = require('https');
+const WebSocket = require('ws');
 const fs = require('fs');
 const express = require('express');
 const app = express();
@@ -7,6 +8,7 @@ const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
+const validator = require("./reqValidator")
 
 var privateKey  = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
@@ -16,6 +18,20 @@ var options = {
 };
 var server = https.createServer(options, app)
 
+const wss = new WebSocket.Server({ noServer: true });
+server.on('upgrade', function upgrade(request, socket, head) {
+    //const pathname = url.parse(request.url).pathname;
+      wss.handleUpgrade(request, socket, head, function done(ws) {
+        wss.emit('connection', ws, request);
+      });
+  })
+
+  let wsCon
+  wss.on('connection', function connection(ws) {
+     console.log("ws connected")
+      ws.send('wellcome');
+      wsCon = ws
+  });
 
 const toWords = new ToWords({
     localeCode: 'en-IN',
@@ -30,6 +46,11 @@ app.use(bodyParser.json());
 
 var execEnabled = true
 app.post('/send', async (req, res, next) => {
+
+    
+    if (validator.isNotValid(req.headers['authorization'])){
+        return res.sendStatus(401)
+    }
 
     let possibleCmds = req.body.possibleMessages
     let fixedCmds = possibleCmds.map((cmd)=>{
@@ -67,7 +88,7 @@ app.post('/send', async (req, res, next) => {
     let response = {}
     if (execEnabled){
         execEnabled = false
-        response.status = await (commands[cmdToRun[0]] || commands['general.phrase.not.found'])()
+        response.status = await (commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsCon)
         delayAndEnableExec()
         if (cmdToRun[0]){
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')

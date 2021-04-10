@@ -7,6 +7,12 @@ let common = {
     },
     'phrase.repated': async ()=>{
         return ['repeated command match']
+    },
+    'web.socket.test': async (ws)=>{
+        if (ws){
+           ws.send('activate perro')
+        }
+        return ['tesing web socket']
     }
 
 }

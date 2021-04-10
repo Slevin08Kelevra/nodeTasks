@@ -48,6 +48,7 @@ mongoUtils.showReplicasStatus = async (mongoInstances) => {
 }
 
 const urlTemplate = 'mongodb://%s:%s@%s/admin?replicaSet=%s&tls=true'
+const urlInsecTemplate = 'mongodb://%s'
 function prepareUrl(mongoInstances) {
     let hosts = []
     mongoInstances.forEach((instance) => {

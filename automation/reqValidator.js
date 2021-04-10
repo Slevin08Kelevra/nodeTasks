@@ -1,6 +1,5 @@
 const moment = require('moment');
 const random = require('random');
-const { startAllReplicas } = require('./mongoUtils');
 
 const strategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9, 9, 9, 9, 9, 6], 
 [4, 6, 1, 1, 2, 5], [2, 5, 7, 5, 3, 9], [5, 5, 5, 8, 9, 6], [6, 7, 2, 9, 8, 9], [9, 2, 7, 6, 4, 3], 
@@ -24,37 +23,48 @@ const strategy = [[9, 9, 2, 4, 2, 3], [1, 6, 3, 9, 5, 7], [8, 7, 8, 3, 5, 9], [9
 [1, 9, 1, 3, 3, 2], [1, 1, 6, 7, 1, 8], [1, 2, 7, 1, 1, 3], [9, 9, 5, 3, 2, 4], [3, 2, 6, 3, 7, 6], 
 [7, 6, 2, 1, 2, 4]]
 
-let hour = moment().hour()
-let minute = moment().minute()
-let day = new Number(moment().format('D'))
-let month = new Number(moment().format('M'))
-let year = moment().year() - 2000
-let dayOfYear = moment().dayOfYear()
+const validator = []
 
-let ran = random.int((min = 0), (max = 99))
+validator.isNotValid = (token)=>{
 
-let card = strategy[ran]
+    token = token.replace(/Bearer /g, '')
+    let chars = token.split('')
+    let TokenPre = chars[0]
+    let TokenPost = chars.slice(-1)
+    console.log(TokenPre + " " + TokenPost)
+    let cardId = new Number((TokenPre === "H")?TokenPost:TokenPre+TokenPost)
 
-let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
+    let hour = moment().hour()
+    let minute = moment().minute()
+    let day = new Number(moment().format('D'))
+    let month = new Number(moment().format('M'))
+    let year = moment().year() - 2000
+    let dayOfYear = moment().dayOfYear()
+    
+    let card = strategy[cardId]
+    
+    let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
+    
+    let parcial = result-card[0]-card[2]-card[5]
+    
+    let ranString = cardId.toString()
+    let pre, post
+    if (ranString.length == 1){
+       pre = 'H'
+       post = ranString
+    } else {
+        let splited = ranString.split('')
+        pre = splited[0]
+        post = splited[1]
+    }
 
-let parcial = result-card[0]-card[2]-card[5]
+    let validToken = pre + parcial.toString().replace(/0/g, 'X') + post
 
-let ranString = ran.toString()
-let pre, post
-if (ranString.length == 1){
-   pre = 'H'
-   post = ranString
-} else {
-    let splited = ranString.split('')
-    pre = splited[0]
-    post = splited[1]
+    console.log(validToken)
+    console.log(token)
+    
+    return (validToken === token)?false:true
 }
-console.log(pre + parcial.toString().replace(/0/g, 'X') + post)
 
 
-
-console.log("random " + ran)
-
-//console.log(strategy[19])
-//console.log(strategy[75])
-
+module.exports = validator;

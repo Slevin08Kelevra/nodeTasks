@@ -15,13 +15,16 @@ var connection_options = {
 };
 
 gralUtils.executeInRemote = async (hosts, cmds) => {
-    rexec(hosts, cmds, connection_options, function(err){
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Command execution ok');
-        }
-    });
+    return new Promise((resolve, reject) => {
+        rexec(hosts, cmds, connection_options, function(err){
+            if (err) {
+                console.log(err);
+                reject(err)
+            } else {
+                resolve('Command execution ok');
+            }
+        });
+    })
 }
 
 gralUtils.executeInLocal = async (cmd) => {
