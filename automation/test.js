@@ -37,7 +37,10 @@ let card = strategy[ran]
 
 let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
 
+
 let parcial = result-card[0]-card[2]-card[5]
+
+console.log(result + " " + parcial )
 
 let ranString = ran.toString()
 let pre, post

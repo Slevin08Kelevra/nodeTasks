@@ -31,7 +31,6 @@ validator.isNotValid = (token)=>{
     let chars = token.split('')
     let TokenPre = chars[0]
     let TokenPost = chars.slice(-1)
-    console.log(TokenPre + " " + TokenPost)
     let cardId = new Number((TokenPre === "H")?TokenPost:TokenPre+TokenPost)
 
     let hour = moment().hour()
@@ -40,7 +39,8 @@ validator.isNotValid = (token)=>{
     let month = new Number(moment().format('M'))
     let year = moment().year() - 2000
     let dayOfYear = moment().dayOfYear()
-    
+
+
     let card = strategy[cardId]
     
     let result = (hour + card[0]) * (minute + card[1]) * (day + card[2]) * (month + card[3]) * (year + card[4]) * (dayOfYear + card[5])
@@ -59,9 +59,6 @@ validator.isNotValid = (token)=>{
     }
 
     let validToken = pre + parcial.toString().replace(/0/g, 'X') + post
-
-    console.log(validToken)
-    console.log(token)
     
     return (validToken === token)?false:true
 }
