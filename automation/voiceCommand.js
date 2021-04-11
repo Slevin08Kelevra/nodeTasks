@@ -3,14 +3,13 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator")
 
-var privateKey  = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
+var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
 var options = {
     key: privateKey,
@@ -21,49 +20,43 @@ var server = https.createServer(options, app)
 const wss = new WebSocket.Server({ noServer: true });
 server.on('upgrade', function upgrade(request, socket, head) {
     //const pathname = url.parse(request.url).pathname;
-      wss.handleUpgrade(request, socket, head, function done(ws) {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
         wss.emit('connection', ws, request);
-      });
-  })
+    });
+})
 
-  let wsCon
-  wss.on('connection', function connection(ws) {
-     console.log("ws connected")
-      ws.send('wellcome');
-      wsCon = ws
-  });
+let wsCon
+wss.on('connection', function connection(ws) {
+    console.log("ws connected")
+    ws.send('wellcome');
+    wsCon = ws
+});
 
 const toWords = new ToWords({
     localeCode: 'en-IN',
     converterOptions: {
-      currency: false,
-      ignoreDecimal: true,
-      ignoreZeroCurrency: true,
+        currency: false,
+        ignoreDecimal: true,
+        ignoreZeroCurrency: true,
     }
-  });
+});
 
-app.use(bodyParser.json());
+app.use(express.urlencoded())
+app.use(express.json());
 
 var execEnabled = true
-app.post('/send', async (req, res, next) => {
 
-    
-    if (validator.isNotValid(req.headers['authorization'])){
-        return res.sendStatus(401)
-    }
-
+let postHanler = async (req) => {
     let possibleCmds = req.body.possibleMessages
-    let fixedCmds = possibleCmds.map((cmd)=>{
+    let fixedCmds = possibleCmds.map((cmd) => {
         let voiceCmd = cmd.toLowerCase()
-        voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number)=>{
+        voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number) => {
             return toWords.convert(Number(number))
         })
         console.log(voiceCmd)
         return voiceCmd
     })
-    
 
-    
     let cmdToRun = ['phrase.not.found']
     let index = 0
     Object.keys(phraseKeyMap).forEach(function (phrase) {
@@ -77,20 +70,20 @@ app.post('/send', async (req, res, next) => {
         })
     });
 
-    if (cmdToRun.length > 1){
+    if (cmdToRun.length > 1) {
         console.log('repeated commands')
-        cmdToRun.forEach((cmd)=>{
+        cmdToRun.forEach((cmd) => {
             console.log(cmd)
         })
         cmdToRun = ['general.phrase.repeated']
     }
-    
+
     let response = {}
-    if (execEnabled){
+    if (execEnabled) {
         execEnabled = false
-        response.status = await (commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsCon)
+        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsCon)
         delayAndEnableExec()
-        if (cmdToRun[0]){
+        if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
         } else {
             response.appliedCmd = 'General phrase not found'
@@ -99,13 +92,40 @@ app.post('/send', async (req, res, next) => {
         response.status = "repeated, repetition not allowed"
     }
 
+    return response
+}
+
+app.post('/send', async (req, res, next) => {
+
+    let response
+    try {
+        if (validator.isNotValid(req.headers['authorization'])) {
+            return res.sendStatus(401)
+        }
+        response = await postHanler(req)
+    } catch (error) {
+        console.log(error)
+        return res.sendStatus(404)
+    }
+
+
     res.json(response)
 })
 
-async function delayAndEnableExec(){
-    setTimeout(function(){
+app.use(function(req, res, next) {
+    // Do logging and user-friendly error message display.
+    console.log('Route does not exist')
+    res.status(404).send({
+        status: 404,
+        message: 'you have nothing to do here! you will be banned',
+        type: 'just4idiots'
+    })
+ })
+
+async function delayAndEnableExec() {
+    setTimeout(function () {
         execEnabled = true
-    },5000);
+    }, 5000);
 };
 
 async function test() {
