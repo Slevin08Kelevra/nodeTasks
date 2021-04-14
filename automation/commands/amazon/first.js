@@ -11,7 +11,7 @@ const amazon = {
 
     'test': async () => {
         console.log("arrived")
-        return "saranga"
+        return ["saranga"]
     },
     'ignite.servers': async () => {
         let data = await awsUtils.startAllInstances()

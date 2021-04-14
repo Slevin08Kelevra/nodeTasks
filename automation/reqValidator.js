@@ -28,6 +28,21 @@ const validator = []
 validator.isNotValid = (token)=>{
 
     token = token.replace(/Bearer /g, '')
+    
+    let scrambleddNumbers = "7925163804"
+    let scrambledLetters = "gNQnPFpwRMhsvBWrJySOfxUDjHelCXAGaqtzEkuZKIdcVobLmYiT"
+    let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    let reSorting = token.replace(/([a-zA-Z]{1})/g, (char) => {
+        let fakePos = scrambledLetters.indexOf(char)
+        return letters.charAt(fakePos)
+     });
+     
+     token = reSorting.replace(/([0-9]{1})/g, (char) => {
+        return scrambleddNumbers.indexOf(new Number(char))
+     });
+
+    token = Buffer.from(token, 'base64').toString('utf-8');
     let chars = token.split('')
     let TokenPre = chars[0]
     let TokenPost = chars.slice(-1)
