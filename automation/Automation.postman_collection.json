@@ -64,8 +64,23 @@
 							"}\r",
 							"let token = pre + parcial.toString().replace(/0/g, 'X') + post\r",
 							"\r",
+							"let rawStr = CryptoJS.enc.Utf8.parse(token)\r",
+							"baseToken = CryptoJS.enc.Base64.stringify(rawStr);\r",
 							"\r",
-							"postman.setEnvironmentVariable(\"my-token\", token)"
+							"let scrambleddNumbers = \"7925163804\"\r",
+							"let scrambledLetters = \"gNQnPFpwRMhsvBWrJySOfxUDjHelCXAGaqtzEkuZKIdcVobLmYiT\"\r",
+							"let letters = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\"\r",
+							"\r",
+							"let scrambledBaseToken = baseToken.replace(/([a-zA-Z]{1})/g, (letter) => {\r",
+							"   let realPos = letters.indexOf(letter)\r",
+							"   return scrambledLetters.charAt(realPos)\r",
+							"});\r",
+							"\r",
+							"scrambledBaseToken = scrambledBaseToken.replace(/([0-9]{1})/g, (number) => {\r",
+							"   return scrambleddNumbers.charAt(new Number(number))\r",
+							"});\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"my-token\", scrambledBaseToken)"
 						],
 						"type": "text/javascript"
 					}

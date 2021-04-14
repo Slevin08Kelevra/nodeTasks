@@ -41,7 +41,7 @@ const toWords = new ToWords({
     }
 });
 
-app.use(express.urlencoded())
+//app.use(express.urlencoded())
 app.use(express.json());
 
 var execEnabled = true
@@ -100,6 +100,7 @@ app.post('/send', async (req, res, next) => {
     let response
     try {
         if (validator.isNotValid(req.headers['authorization'])) {
+            console.log("token not authorized: " + req.headers['authorization'])
             return res.sendStatus(401)
         }
         response = await postHanler(req)
@@ -113,7 +114,6 @@ app.post('/send', async (req, res, next) => {
 })
 
 app.use(function(req, res, next) {
-    // Do logging and user-friendly error message display.
     console.log('Route does not exist')
     res.status(404).send({
         status: 404,
