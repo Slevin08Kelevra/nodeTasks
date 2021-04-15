@@ -11,9 +11,12 @@ const validator = require("./reqValidator")
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
+var clientCert = [fs.readFileSync(__dirname + '/certs/client-ca-crt.pem')]
 var options = {
     key: privateKey,
-    cert: certificate
+    cert: certificate,
+    ca: clientCert,
+    requestCert: true
 };
 var server = https.createServer(options, app)
 
