@@ -8,7 +8,7 @@ const simpleFilter = (instance) => {
 }
 
 const mongo = {
-    'ignite.replicas': async () => {
+    'ignite.replicas.set': async () => {
 
         let result = []
         try {
