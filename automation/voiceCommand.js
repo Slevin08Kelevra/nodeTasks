@@ -11,7 +11,7 @@ const validator = require("./reqValidator")
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
-var clientCert = [fs.readFileSync(__dirname + '/certs/client-ca-crt.pem')]
+var clientCert = [fs.readFileSync(__dirname + '/certs/client-ca-crt.pem', 'utf8')]
 var options = {
     key: privateKey,
     cert: certificate,
@@ -20,7 +20,23 @@ var options = {
 };
 var server = https.createServer(options, app)
 
-const wss = new WebSocket.Server({ noServer: true });
+const wss = new WebSocket.Server({
+    noServer: true,
+    verifyClient: (info, callback) => {
+        try {
+            if (validator.isNotValid(info.req.headers.authorization)) {
+                console.log("token not authorized: " + info.req.headers.authorization)
+                callback(false, 401, 'Unauthorized');
+            } else {
+                callback(true);
+            }
+        } catch (error) {
+            console.log(error)
+            callback(false, 404, 'Not Found');
+        }
+    }
+
+});
 server.on('upgrade', function upgrade(request, socket, head) {
     //const pathname = url.parse(request.url).pathname;
     wss.handleUpgrade(request, socket, head, function done(ws) {
@@ -46,6 +62,20 @@ const toWords = new ToWords({
 
 //app.use(express.urlencoded())
 app.use(express.json());
+
+var validate = function(req, res, next) {
+    try {
+        if (validator.isNotValid(req.headers['authorization'])) {
+            console.log("token not authorized: " + req.headers['authorization'])
+            return res.sendStatus(401)
+        }
+    } catch (error) {
+        console.log(error)
+        return res.sendStatus(404)
+    }
+    next();
+}
+app.use(validate)
 
 var execEnabled = true
 
@@ -101,19 +131,9 @@ let postHanler = async (req) => {
 app.post('/send', async (req, res, next) => {
 
     let response
-    try {
-        if (validator.isNotValid(req.headers['authorization'])) {
-            console.log("token not authorized: " + req.headers['authorization'])
-            return res.sendStatus(401)
-        }
-        response = await postHanler(req)
-    } catch (error) {
-        console.log(error)
-        return res.sendStatus(404)
-    }
-
-
+    response = await postHanler(req)
     res.json(response)
+    
 })
 
 app.use(function(req, res, next) {
