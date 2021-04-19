@@ -1,10 +1,15 @@
 let basics = {
-    
-'release.my.information': async (ws)=>{
-        if (ws){
-           ws.send('activate perro')
+
+    'release.my.information': async (wsConns) => {
+        let ws = wsConns.get("BI_COMPUTER")
+        let ret
+        if (ws) {
+            ws.send('activate perro')
+            ret = ['tesing web socket']
+        } else {
+            ret = ['web socket not connected!']
         }
-        return ['tesing web socket']
+        return ret
     }
 
 }

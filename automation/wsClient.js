@@ -5,8 +5,8 @@ const shell = require('node-powershell');
 //var robot = require("robotjs");
 var ks = require('node-key-sender');
 
-var privateKey = fs.readFileSync('C:/repos/client-key.pem', 'utf8');
-var certificate = fs.readFileSync('C:/repos/client-crt.pem', 'utf8');
+var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
+var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 
 const wss = new WebSocket('wss://192.168.1.132:8095',{
     protocolVersion: 8,
@@ -14,11 +14,11 @@ const wss = new WebSocket('wss://192.168.1.132:8095',{
     rejectUnauthorized: false,
     key: privateKey,
     cert: certificate,
-    headers: {"authorization": validator.generateToken()}
+    headers: {"authorization": validator.generateToken(), "client-id": "BI_COMPUTER"}
   });
 
 wss.on('open', function open() {
-  wss.send('something');
+  //wss.send('something');
 });
 
 wss.on('message', function incoming(data) {

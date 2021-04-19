@@ -44,11 +44,25 @@ server.on('upgrade', function upgrade(request, socket, head) {
     });
 })
 
-let wsCon
-wss.on('connection', function connection(ws) {
+const wsConns = new Map();
+wss.on('connection', function connection(ws, req) {
+
     console.log("ws connected")
-    //ws.send('wellcome');
-    wsCon = ws
+    let clientId = req.headers['client-id']
+    wsConns.set(clientId, ws)
+
+    ws.on('message', function incoming(message) {
+        console.log(message)
+    });
+
+    ws.on('close', function close() {
+        wsConns.delete(clientId);
+
+    });
+
+    ws.on('error', function(err) {
+        console.error('ws error: ' + err);
+    });
 });
 
 const toWords = new ToWords({
@@ -114,7 +128,7 @@ let postHanler = async (req) => {
     let response = {}
     if (execEnabled) {
         execEnabled = false
-        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsCon)
+        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
         delayAndEnableExec()
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
