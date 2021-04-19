@@ -47,7 +47,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
 let wsCon
 wss.on('connection', function connection(ws) {
     console.log("ws connected")
-    ws.send('wellcome');
+    //ws.send('wellcome');
     wsCon = ws
 });
 

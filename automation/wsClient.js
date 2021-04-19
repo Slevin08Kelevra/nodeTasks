@@ -1,11 +1,12 @@
 const WebSocket = require('ws');
 const fs = require('fs');
 const validator = require("./reqValidator")
+const shell = require('node-powershell');
 //var robot = require("robotjs");
-//var ks = require('node-key-sender');
+var ks = require('node-key-sender');
 
-var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
-var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
+var privateKey = fs.readFileSync('C:/repos/client-key.pem', 'utf8');
+var certificate = fs.readFileSync('C:/repos/client-crt.pem', 'utf8');
 
 const wss = new WebSocket('wss://192.168.1.132:8095',{
     protocolVersion: 8,
@@ -31,6 +32,21 @@ wss.on('message', function incoming(data) {
     //ks.sendKeys(['C', 'h', 'a','r', 'l', 'y','0', '1', 'G','a', 'r', 'c','i', 'a']);
     
    }, 2000);
+
+   let ps = new shell({
+    executionPolicy: 'Bypass',
+    noProfile: true
+  });
+  
+  ps.addCommand('Get-Content C:\\Users\\paparini\\Documents\\myinfo.txt | Set-Clipboard')
+  ps.invoke().then(output => {
+    ks.sendCombination(['control', 'v']);
+  }).catch(err => {
+    console.log(err);
+    ps.dispose();
+  });
+
+ 
   
   console.log(data);
 });
