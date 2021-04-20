@@ -1,0 +1,25 @@
+[mongo]
+bin.path = C:\\Program Files\\MongoDB\\Server\\4.2\\bin
+dump.parameters = --archive=%s --host localhost:%s -d edpp-db -u %s -p %s
+backup.path = C:\\mongoBackUp\\edpp-db-rotate-%s
+local.backup.path = C:\\mongoBackUp\\edpp-local-db-rotate-%s
+remote.forward.port = 27018
+develop.user = userTWE
+develop.pass = fXSObmt8cVX7Wgk4
+restore.params = --drop --archive=%s
+rotate.number = 10
+
+[process]
+debug.dump.path = C:\\repos\\nodeAuto\\debug.txt
+
+[oc]
+bin.path = C:\\oc
+connect.params = login https://inh-ocdev.eu.boehringer.com --insecure-skip-tls-verify=true
+list.pods.command = oc get pods
+filter.pod.regex = ^mongodb-[0-9]+
+filter.pod.status = Running
+node.storage = C:/repos/nodeAuto/storage.data
+username = paparini
+password = Alvaro01Costarica
+forward.port.conf = 27018:27017
+vpn.url.test = https://inh-ocdev.eu.boehringer.com
