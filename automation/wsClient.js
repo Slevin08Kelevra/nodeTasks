@@ -41,12 +41,11 @@ wss.on('message', function incoming(data) {
   ps.addCommand('Get-Content C:\\Users\\paparini\\Documents\\myinfo.txt | Set-Clipboard')
   ps.invoke().then(output => {
     ks.sendCombination(['control', 'v']);
+    wss.send("key sent!!!")
   }).catch(err => {
     console.log(err);
     ps.dispose();
   });
-
- 
   
   console.log(data);
 });

@@ -7,7 +7,8 @@ const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
-const validator = require("./reqValidator")
+const validator = require("./reqValidator");
+const { timeEnd } = require('console');
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
@@ -45,14 +46,37 @@ server.on('upgrade', function upgrade(request, socket, head) {
 })
 
 const wsConns = new Map();
+const respObserver = (timeout, errMessage) => {
+    return {
+        res: null, 
+        redirect: (message) => {
+           res(message)
+        },
+        expect: async () => {
+            let timeOutProm =  new Promise((resolve, reject) => {
+                setTimeout( () => { reject(errMessage); }, timeout);
+            })
+            let messageProm = new Promise((resolve, reject) => {
+                res = resolve
+            })
+            return Promise.race([ 
+                messageProm, 
+                timeOutProm, 
+              ])
+        }
+    }
+}
 wss.on('connection', function connection(ws, req) {
 
     console.log("ws connected")
     let clientId = req.headers['client-id']
-    wsConns.set(clientId, ws)
+    let obs = respObserver(4000, "web socket time out")
+    
+    wsConns.set(clientId, {ws, obs})
 
     ws.on('message', function incoming(message) {
         console.log(message)
+        obs.redirect(message)
     });
 
     ws.on('close', function close() {

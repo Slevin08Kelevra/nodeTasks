@@ -1,11 +1,18 @@
 let basics = {
 
     'release.my.information': async (wsConns) => {
-        let ws = wsConns.get("BI_COMPUTER")
+        let {ws, obs} = wsConns.get("BI_COMPUTER")
         let ret
         if (ws) {
             ws.send('activate perro')
-            ret = ['tesing web socket']
+            let message = "que mierda"
+            try {
+                message = await obs.expect()
+            } catch (error) {
+                message = error
+            }
+            
+            ret = [message]
         } else {
             ret = ['web socket not connected!']
         }
