@@ -23,9 +23,9 @@ var server = https.createServer(options, app)
 
 const wss = new WebSocket.Server({
     noServer: true,
-    verifyClient: (info, callback) => {
+    verifyClient: async (info, callback) => {
         try {
-            if (validator.isNotValid(info.req.headers.authorization)) {
+            if (await validator.isNotValid(info.req.headers.authorization)) {
                 console.log("token not authorized: " + info.req.headers.authorization)
                 callback(false, 401, 'Unauthorized');
             } else {
@@ -71,7 +71,6 @@ wss.on('connection', function connection(ws, req) {
     console.log("ws connected")
     let clientId = req.headers['client-id']
     let obs = respObserver(4000, "web socket time out")
-    
     wsConns.set(clientId, {ws, obs})
 
     ws.on('message', function incoming(message) {
@@ -80,8 +79,8 @@ wss.on('connection', function connection(ws, req) {
     });
 
     ws.on('close', function close() {
-        wsConns.delete(clientId);
-
+        console.log(clientId +  ' closed')
+        wsConns.delete(clientId)
     });
 
     ws.on('error', function(err) {
@@ -101,9 +100,10 @@ const toWords = new ToWords({
 //app.use(express.urlencoded())
 app.use(express.json());
 
-var validate = function(req, res, next) {
+var validate = async (req, res, next) => {
+    console.log(req.headers['authorization'])
     try {
-        if (validator.isNotValid(req.headers['authorization'])) {
+        if (await validator.isNotValid(req.headers['authorization'])) {
             console.log("token not authorized: " + req.headers['authorization'])
             return res.sendStatus(401)
         }
