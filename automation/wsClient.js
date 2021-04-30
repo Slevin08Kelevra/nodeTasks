@@ -9,34 +9,52 @@ const { exec } = require('child_process');
 var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 
-const wss = new WebSocket('wss://192.168.1.132:8095', {
-  protocolVersion: 8,
-  origin: 'https://192.168.1.132:8095',
-  rejectUnauthorized: false,
-  key: privateKey,
-  cert: certificate,
-  headers: { "authorization": validator.generateToken(), "client-id": "BI_COMPUTER" }
-});
+var wss
+const connect = function () {
+  console.log('connecting')
+  wss = new WebSocket('wss://192.168.1.132:8095', {
+    protocolVersion: 8,
+    origin: 'https://192.168.1.132:8095',
+    rejectUnauthorized: false,
+    key: privateKey,
+    cert: certificate,
+    headers: { "authorization": validator.generateToken(), "client-id": "BI_COMPUTER" }
+  });
 
-wss.on('open', function open() {
-  //wss.send('something');
-});
+  wss.on('open', function () {
+    console.log('socket open');
+  });
 
-wss.on('message', function incoming(action) {
+  wss.on('close', async function () {
+    console.log('socket close');
+    await sleep(10000)
+    connect()
+    
+  });
 
-  switch (action) {
-    case "showMyInf":
-      showMyInf()
-      break;
-    case "unlock":
-      unlock()
-      break;
-    default:
-      text = "Action not recognized!";
-  }
+  wss.on('error', function (error) {
+    console.log(error.message)
+  });
 
-  console.log("doing: " + action);
-});
+  wss.on('message', function incoming(action) {
+
+    switch (action) {
+      case "showMyInf":
+        showMyInf()
+        break;
+      case "unlock":
+        unlock()
+        break;
+      default:
+        text = "Action not recognized!";
+    }
+
+    console.log("doing: " + action);
+  });
+
+}
+
+connect()
 
 function unlock() {
   exec('node unlock.js Alvaro01Costarica', (err, stdout, stderr) => {
@@ -63,3 +81,9 @@ function showMyInf() {
     ps.dispose();
   });
 }
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+} 
