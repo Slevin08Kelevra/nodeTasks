@@ -21,10 +21,14 @@ var options = {
 };
 var server = https.createServer(options, app)
 
+const wsConns = new Map();
 const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: async (info, callback) => {
         try {
+            if ( wsConns.get(info.req.headers['client-id'])){
+                callback(false, 401, 'Unauthorized');
+            }
             if (await validator.isNotValid(info.req.headers.authorization)) {
                 console.log("token not authorized: " + info.req.headers.authorization)
                 callback(false, 401, 'Unauthorized');
@@ -45,7 +49,6 @@ server.on('upgrade', function upgrade(request, socket, head) {
     });
 })
 
-const wsConns = new Map();
 const respObserver = (timeout, errMessage) => {
     return {
         res: null, 
