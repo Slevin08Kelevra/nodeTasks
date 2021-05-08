@@ -3,3 +3,4 @@
 **/package.json
 
 automation/reqValidator.js
+automation/Automation.postman_collection.json
