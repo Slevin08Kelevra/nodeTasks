@@ -49,6 +49,9 @@ awsUtils.describeFiltered = async (filterFunc) => {
         instance.dns = res.Instances[0].PublicDnsName
         instance.pubIp = res.Instances[0].PublicIpAddress
         instance.status = res.Instances[0].State.Name
+        instance.group = res.Instances[0].Tags.find(tag => {
+            return tag.Key === "group"
+        }).Value
         instance.name = res.Instances[0].Tags.find(tag => {
             return tag.Key === "Name"
         }).Value
@@ -83,8 +86,8 @@ awsUtils.shtudownInstancesByIdList = async (idList) => {
     })
 }
 
-awsUtils.shtudownAllInstances = async () => {
-    let instances = await awsUtils.describeFiltered()
+awsUtils.shtudownAllInstances = async (filterFunc) => {
+    let instances = await awsUtils.describeFiltered(filterFunc)
     let idList = instances.map(instance => instance.id)
     let data = await awsUtils.shtudownInstancesByIdList(idList)
     return data.StoppingInstances.map(inst => {
@@ -112,8 +115,8 @@ awsUtils.startInstancesByIdList = async (idList) => {
     })
 }
 
-awsUtils.startAllInstances = async () => {
-    let instances = await awsUtils.describeFiltered()
+awsUtils.startAllInstances = async (filterFunc) => {
+    let instances = await awsUtils.describeFiltered(filterFunc)
     let idList = instances.map(instance => instance.id)
     let data = await awsUtils.startInstancesByIdList(idList)
     return data.StartingInstances.map(inst => {

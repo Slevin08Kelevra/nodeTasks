@@ -14,6 +14,7 @@ f
 }
 
 async function execute(wsConns, doWhat) {
+    //do while expet gives forgiven
     let ret = ['not waiting something is wrong']
     if (!wsConns.get("BI_COMPUTER")) {
         ret = ['web socket not connected!']

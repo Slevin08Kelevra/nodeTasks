@@ -7,6 +7,10 @@ const simpleFilter = (instance) => {
     return instance.index != undefined && instance.index != '4'
 }
 
+const excludeAutomationFilter = (instance) => {
+    return instance.group != undefined && instance.group != 'automation'
+}
+
 const amazon = {
 
     'test': async () => {
@@ -14,7 +18,7 @@ const amazon = {
         return ["saranga"]
     },
     'ignite.servers': async () => {
-        let data = await awsUtils.startAllInstances()
+        let data = await awsUtils.startAllInstances(excludeAutomationFilter)
 
         let fixHosts = getFixHostsFunc()
         let ids = data.map((inst) => {
@@ -31,7 +35,7 @@ const amazon = {
     },
     'servers.shutdown': async () => {
 
-        let data = await awsUtils.shtudownAllInstances()
+        let data = await awsUtils.shtudownAllInstances(excludeAutomationFilter)
 
         return data.map((inst) => {
             return `${inst.id} -> ${inst.status}`
