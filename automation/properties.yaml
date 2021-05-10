@@ -30,7 +30,7 @@ mongo:
   
 aws:
   user: ubuntu
-  key: /home/pablo/dumps/firstKey.pem
+  key: none
   port: 22
   remove_old_hosts: sudo sed -i '/srv[[:digit:]]\./d' /etc/hosts
   remove_my_local_hosts: sudo sed -i '/# My hosts:/,$d' /etc/hosts

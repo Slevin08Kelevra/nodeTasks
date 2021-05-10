@@ -11,7 +11,7 @@ const gralUtils = []
 var connection_options = {
     port: props.aws.port,
     username: props.aws.user,
-    privateKey: fs.readFileSync(props.aws.key)
+    privateKey: fs.readFileSync(process.env.AWS_KEY_PATH)
 };
 
 gralUtils.executeInRemote = async (hosts, cmds) => {
