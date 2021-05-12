@@ -1,2 +1,2 @@
-00000000
-<input id="prodId" name="prodId" type="hidden" value="xm234jq">
+This is a test page!
+<input id="prodId" name="rh" type="hidden" value="wifi">
