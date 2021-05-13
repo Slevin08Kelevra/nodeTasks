@@ -4,7 +4,9 @@ const props = require('./props.js')
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
+const moment = require('moment')
 
+const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
 
 
@@ -35,6 +37,16 @@ gralUtils.executeInLocal = async (cmd) => {
         throw new Error('Excecution problem')
     }
     console.log(`Command: (${cmd}) -> OK`)
+}
+
+gralUtils.logInfo = async(msg) => {
+    let date = moment().format(dateFormat)
+    console.log(date + " -> " + msg)
+}
+
+gralUtils.logError = async(msg) => {
+    let date = moment().format(dateFormat)
+    console.error(date + " -> " + msg)
 }
 
 module.exports = gralUtils

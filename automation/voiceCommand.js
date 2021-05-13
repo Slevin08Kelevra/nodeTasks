@@ -8,6 +8,7 @@ const phraseKeyMap = commands.phraseKeyMap
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator");
+const gralUtils = require("./gralUtils");
 const { timeEnd } = require('console');
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
@@ -30,13 +31,13 @@ const wss = new WebSocket.Server({
                 callback(false, 401, 'Unauthorized');
             }
             if (await validator.isNotValid(info.req.headers.authorization)) {
-                console.log("token not authorized: " + info.req.headers.authorization)
+                gralUtils.logInfo("token not authorized: " + info.req.headers.authorization)
                 callback(false, 401, 'Unauthorized');
             } else {
                 callback(true);
             }
         } catch (error) {
-            console.log(error)
+            gralUtils.logInfo(error)
             callback(false, 404, 'Not Found');
         }
     }
@@ -71,23 +72,23 @@ const respObserver = (timeout, errMessage) => {
 }
 wss.on('connection', function connection(ws, req) {
 
-    console.log("ws connected")
+    gralUtils.logInfo("ws connected") 
     let clientId = req.headers['client-id']
     let obs = respObserver(4000, "web socket time out")
     wsConns.set(clientId, {ws, obs})
 
     ws.on('message', function incoming(message) {
-        console.log(message)
+        gralUtils.logInfo("incomming ws msg: " + message)
         obs.redirect(message)
     });
 
     ws.on('close', function close() {
-        console.log(clientId +  ' closed')
+        gralUtils.logInfo(clientId +  ' closed')
         wsConns.delete(clientId)
     });
 
     ws.on('error', function(err) {
-        console.error('ws error: ' + err);
+        gralUtils.logError('ws error: ' + err);
     });
 });
 
@@ -104,14 +105,14 @@ const toWords = new ToWords({
 app.use(express.json());
 
 var validate = async (req, res, next) => {
-    console.log(req.headers['authorization'])
+    //gralUtils.logInfo("endpint auth token: " + req.headers['authorization'])
     try {
         if (await validator.isNotValid(req.headers['authorization'])) {
-            console.log("token not authorized: " + req.headers['authorization'])
+            gralUtils.logInfo("token not authorized: " + req.headers['authorization'])
             return res.sendStatus(401)
         }
     } catch (error) {
-        console.log(error)
+        gralUtils.logError(error)
         return res.sendStatus(404)
     }
     next();
@@ -127,7 +128,7 @@ let postHanler = async (req) => {
         voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number) => {
             return toWords.convert(Number(number))
         })
-        console.log(voiceCmd)
+        gralUtils.logInfo("voice cmd: " + voiceCmd)
         return voiceCmd
     })
 
@@ -137,7 +138,7 @@ let postHanler = async (req) => {
         fixedCmds.some(voiceCmd => {
             var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
             if (similarity > 0.85) {
-                console.log(similarity);
+                gralUtils.logInfo(similarity);
                 cmdToRun[index++] = phraseKeyMap[phrase]
                 return true
             }
@@ -145,9 +146,9 @@ let postHanler = async (req) => {
     });
 
     if (cmdToRun.length > 1) {
-        console.log('repeated commands')
+        gralUtils.logInfo('repeated commands')
         cmdToRun.forEach((cmd) => {
-            console.log(cmd)
+            gralUtils.logInfo(cmd)
         })
         cmdToRun = ['general.phrase.repeated']
     }
@@ -178,7 +179,7 @@ app.post('/send', async (req, res, next) => {
 })
 
 app.use(function(req, res, next) {
-    console.log('Route does not exist')
+    gralUtils.logInfo('requested Route that not exist')
     res.status(404).send({
         status: 404,
         message: 'you have nothing to do here! you will be banned',
@@ -192,15 +193,11 @@ async function delayAndEnableExec() {
     }, 5000);
 };
 
-async function test() {
-    console.log("async called")
-}
-
 server.listen(8095, function () {
 
     let host = server.address().address
     let port = server.address().port
 
-    console.log("Example app listening at http://%s:%s", host, port)
+    gralUtils.logInfo(`Started voice command app, listening at port ${port}`)
 
 })
