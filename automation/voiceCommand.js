@@ -10,6 +10,7 @@ const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator");
 const gralUtils = require("./gralUtils");
 const { timeEnd } = require('console');
+require("./schedules/chckWhereIsConn.js")
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');

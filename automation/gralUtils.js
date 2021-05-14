@@ -5,6 +5,8 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
 const moment = require('moment')
+const { networkInterfaces } = require('os');
+const nets = networkInterfaces();
 
 const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
@@ -47,6 +49,18 @@ gralUtils.logInfo = async(msg) => {
 gralUtils.logError = async(msg) => {
     let date = moment().format(dateFormat)
     console.error(date + " -> " + msg)
+}
+
+gralUtils.getLocalIp = () => {
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === 'IPv4' && !net.internal) {
+                //console.log("local ip: " + name + " " + net.address)
+                return net.address
+            }
+        }
+    }
+    return 0
 }
 
 module.exports = gralUtils

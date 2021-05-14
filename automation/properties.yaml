@@ -36,3 +36,10 @@ aws:
   remove_my_local_hosts: sudo sed -i '/# My hosts:/,$d' /etc/hosts
   add_mongo_host_title: sudo sed -i -e '$a/# Mongo hosts/' /etc/hosts
   add_new_host: sudo sed -i -e '$a%s %s' /etc/hosts
+
+schedules:
+  git_prop_folder: /home/pablo/Documents/repos/nodeTasksPage/nodeTasks
+  git_prop_file: /home/pablo/Documents/repos/nodeTasksPage/nodeTasks/index.md
+  git_prop_template: /home/pablo/Documents/repos/nodeTasks/automation/templates/propsPageTemplate.txt
+  phone_mac: 88:9E:33:7E:58:7D
+  phone_find_ip_cmd: "sudo nmap -sP 192.168.1.1/24 | awk '/88:9E:33:7E:58:7D/{print $3}'"

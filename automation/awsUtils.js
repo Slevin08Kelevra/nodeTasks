@@ -34,7 +34,7 @@ awsUtils.describeAll = async () => {
 }
 
 awsUtils.describeFiltered = async (filterFunc) => {
-    
+
     let data
     try {
         data = await awsUtils.describeAll()
@@ -57,12 +57,12 @@ awsUtils.describeFiltered = async (filterFunc) => {
         }).Value
         instance.index = res.Instances[0].Tags.find(tag => {
             return tag.Key.toLowerCase() === "index"
-        })?.Value 
+        })?.Value
         instance.mongoHost = `srv${instance.index}.${props.mongo.domain}`
         return instance
     })
 
-    if (filterFunc){
+    if (filterFunc) {
         filteredList = filteredList.filter(filterFunc)
     }
 
@@ -127,19 +127,28 @@ awsUtils.startAllInstances = async (filterFunc) => {
     })
 }
 
- awsUtils.waitStatus = {'run': 'instanceRunning'}
- awsUtils.waitFor = async (status, idList, callback) => {
+awsUtils.waitStatus = {
+    'run': 'instanceRunning',
+    'stop': 'instanceStopped'
+}
+awsUtils.waitFor = async (status, idList, callback) => {
     let params = {
         InstanceIds: idList
     };
-    ec2.waitFor(status, params, function (err, data) {
+    ec2.waitFor(status, params, function (err, rawData) {
         if (err) {
             console.log(err, err.stack);
         }
         else {
-            console.log(`All instances in ${status}`);
-            callback()
-        }           
+            //console.log(`Instances ${status}`);
+            let data = rawData.Reservations.map(res => {
+                let instance = {}
+                instance.id = res.Instances[0].InstanceId
+                instance.pubIp = res.Instances[0].PublicIpAddress
+                return instance
+            })
+            callback(data)
+        }
     });
 }
 
