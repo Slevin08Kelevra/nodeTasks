@@ -1,4 +1,4 @@
-This is a test page!
+This is a testing page!
 
 <input id="1" name="rh" type="hidden" value="none">
 <input id="2" name="lh" type="hidden" value="192.168.1.132">
