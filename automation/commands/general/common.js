@@ -7,6 +7,9 @@ let common = {
     },
     'phrase.repated': async ()=>{
         return ['repeated command match']
+    },
+    'ping': async ()=>{
+        return ['pong']
     }
 }
 
