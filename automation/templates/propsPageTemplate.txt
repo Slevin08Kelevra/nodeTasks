@@ -1,4 +1,6 @@
-This is a test page!
-<input id="1" name="rh" type="hidden" value="VALUE_RH">
-<input id="2" name="lh" type="hidden" value="VALUE_LH">
-<input id="3" name="st" type="hidden" value="VALUE_ST">
+This is a testing page!
+<section>
+	<input id="1" name="rh" type="hidden" value="VALUE_RH">
+	<input id="2" name="lh" type="hidden" value="VALUE_LH">
+	<input id="3" name="st" type="hidden" value="VALUE_ST">
+</section>
