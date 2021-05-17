@@ -62,6 +62,9 @@ wsClient.start = (ip, st) => {
         evalueteStatuses()
         wss.send("Restarting in 60 seconds!")
         break;
+      case "ruok":
+        wss.send("Ubuntu is fine, Sir!")
+        break;
       default:
         text = "Action not recognized!";
     }
@@ -74,6 +77,10 @@ wsClient.start = (ip, st) => {
 wsClient.stop = () => {
   stopping = true
   wss.close()
+}
+
+wsClient.isConnected = () => {
+  return wss.readyState === WebSocket.OPEN
 }
 
 function unlock() {

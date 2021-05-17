@@ -5,6 +5,7 @@ var fs = require('fs')
 const gralUtils = require("./../gralUtils");
 const awsUtils = require("./../awsUtils");
 const props = require('./../props')
+const wsClient = require('./../wsClient')
 
 var wsConns
 
@@ -33,6 +34,7 @@ function startSchedule() {
 
 
 var phoneConnectedToWifi;
+var awsCentinelIpOld
 
 function checkPhoneConnected() {
     let ubuntuIp = gralUtils.getLocalIp()
@@ -62,9 +64,15 @@ function checkPhoneConnected() {
                     awsUtils.waitFor(awsUtils.waitStatus['run'], ids, (instData) => {
                         gralUtils.logInfo("centinel started!")
                         let awsCentinelIp = instData.map((inst) => { return inst.pubIp }).find(ip => true)
+                        awsCentinelIpOld = awsCentinelIp
+                        wsClient.start(awsCentinelIp, "pepe")
                         writeFileFromTemplate("pepe", ubuntuIp, awsCentinelIp)
                     })
                 }
+
+                if (!wsClient.isConnected()){
+                    wsClient.start(awsCentinelIpOld, "pepe")
+                 }
             }
 
         } else {
@@ -105,7 +113,8 @@ function writeFileFromTemplate(status, wifi, pepe) {
         fs.writeFile(destFile, result, 'utf8', async (err) => {
             if (err) return gralUtils.logError(err);
             await git.add('./props.html').commit("Changing data!").push();
-             if (wsConns.get("BI_COMPUTER")) {
+            //poner solo si es pepe!!!!!
+            if (wsConns.get("BI_COMPUTER")) {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
                 ws.send("ws-restart")
                 let message = ""
@@ -116,7 +125,7 @@ function writeFileFromTemplate(status, wifi, pepe) {
                 }
 
                 console.log(message)
-            } 
+            }
         });
     });
 }
