@@ -8,7 +8,10 @@ let basics = {
     'unlock': async (wsConns) => {
 
         return await execute(wsConns, 'unlock')
-f
+    },
+    'web socket restart': async (wsConns) => {
+
+        return await execute(wsConns, 'ws-restart')
     }
 
 }

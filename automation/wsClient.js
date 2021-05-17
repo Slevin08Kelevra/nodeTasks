@@ -5,6 +5,7 @@ const shell = require('node-powershell');
 const ks = require('node-key-sender');
 const SerialPort = require('serialport')
 const { exec } = require('child_process');
+const gralUtils = require('./gralUtils')
 
 var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
@@ -53,7 +54,13 @@ wsClient.start = (ip)=> {
         break;
       case "ws-restart":
         wsClient.stop()
-        
+        gralUtils.getGitProps((localhost, remotehost, status)=>{
+          if (status == "wifi"){
+              wsClient.start(localhost)
+          } else {
+              wsClient.start(remotehost)
+          }
+      })
         break;
       default:
         text = "Action not recognized!";
