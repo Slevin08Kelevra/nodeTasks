@@ -13,8 +13,11 @@ var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 const wsClient = []
 var stopping = false;
 
+var tryedIp
+var lastUsedIp
 var wss
 wsClient.start = (ip) => {
+  tryedIp = ip
   console.log('connecting')
   wss = new WebSocket(`wss://${ip}:8095`, {
     protocolVersion: 8,
@@ -26,6 +29,7 @@ wsClient.start = (ip) => {
   });
 
   wss.on('open', function () {
+    lastUsedIp = tryedIp
     console.log('socket open');
   });
 
@@ -33,7 +37,7 @@ wsClient.start = (ip) => {
     console.log('socket close');
     if (!stopping) {
       await sleep(10000)
-      wsClient.start()
+      wsClient.start(lastUsedIp)
     } else {
       stopping = false;
     }

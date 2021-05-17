@@ -10,7 +10,7 @@ const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator");
 const gralUtils = require("./gralUtils");
 const { timeEnd } = require('console');
-require("./schedules/chckWhereIsConn.js")
+const checker = require("./schedules/chckWhereIsConn.js")
 
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
@@ -24,6 +24,7 @@ var options = {
 var server = https.createServer(options, app)
 
 const wsConns = new Map();
+checker.setWsConns(wsConns)
 const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: async (info, callback) => {

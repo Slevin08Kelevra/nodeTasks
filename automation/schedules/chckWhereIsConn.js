@@ -6,6 +6,8 @@ const gralUtils = require("./../gralUtils");
 const awsUtils = require("./../awsUtils");
 const props = require('./../props')
 
+const wsConns
+
 const findCentinel = (instance) => {
     return instance.name == 'centinel'
 }
@@ -100,9 +102,29 @@ function writeFileFromTemplate(status, wifi, pepe) {
         result = result.replace(/VALUE_LH/g, wifi);
         result = result.replace(/VALUE_ST/g, status);
 
-        fs.writeFile(destFile, result, 'utf8', function (err) {
+        fs.writeFile(destFile, result, 'utf8', async (err) => {
             if (err) return gralUtils.logError(err);
-            git.add('./props.html').commit("Changing data!").push();
+            await git.add('./props.html').commit("Changing data!").push();
+            if (wsConns.get("BI_COMPUTER")) {
+                let { ws, obs } = wsConns.get("BI_COMPUTER")
+                ws.send("ws-restart")
+                let message = ""
+                try {
+                    message = await obs.expect()
+                } catch (error) {
+                    message = error
+                }
+
+                console.log(message)
+            }
         });
     });
 }
+
+const checker = []
+const wsConns
+checker.setWsConns = (wc)=>{
+    wsConns = ws
+}
+
+module.exports = checker
