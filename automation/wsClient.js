@@ -13,10 +13,12 @@ var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 const wsClient = []
 var stopping = false;
 
+var currentConnStatus
 var tryedIp
 var lastUsedIp
 var wss
-wsClient.start = (ip) => {
+wsClient.start = (ip, st) => {
+  currentConnStatus = st
   tryedIp = ip
   console.log('connecting')
   wss = new WebSocket(`wss://${ip}:8095`, {
@@ -37,7 +39,7 @@ wsClient.start = (ip) => {
     console.log('socket close');
     if (!stopping) {
       await sleep(10000)
-      wsClient.start(lastUsedIp)
+      wsClient.start(lastUsedIp, currentConnStatus)
     } else {
       stopping = false;
     }
@@ -61,15 +63,15 @@ wsClient.start = (ip) => {
           wsClient.stop()
           gralUtils.getGitProps((localhost, remotehost, status) => {
             if (status == "wifi") {
-              wsClient.start(localhost)
+              wsClient.start(localhost, status)
             } else {
-              wsClient.start(remotehost)
+              wsClient.start(remotehost, status)
             }
 
           });
-        }, 5000);
+        }, 30000);
 
-        wss.send("Restarting in 5 seconds!")
+        wss.send("Restarting in 30 seconds!")
         break;
       default:
         text = "Action not recognized!";

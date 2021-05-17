@@ -3,8 +3,8 @@ const gralUtils = require('./gralUtils')
 
 gralUtils.getGitProps((localhost, remotehost, status)=>{
     if (status == "wifi"){
-        wsClient.start(localhost)
+        wsClient.start(localhost, status)
     } else {
-        wsClient.start(remotehost)
+        wsClient.start(remotehost, status)
     }
 })

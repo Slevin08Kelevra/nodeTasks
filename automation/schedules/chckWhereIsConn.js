@@ -105,7 +105,7 @@ function writeFileFromTemplate(status, wifi, pepe) {
         fs.writeFile(destFile, result, 'utf8', async (err) => {
             if (err) return gralUtils.logError(err);
             await git.add('./props.html').commit("Changing data!").push();
-            if (wsConns.get("BI_COMPUTER")) {
+             if (wsConns.get("BI_COMPUTER")) {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
                 ws.send("ws-restart")
                 let message = ""
@@ -116,7 +116,7 @@ function writeFileFromTemplate(status, wifi, pepe) {
                 }
 
                 console.log(message)
-            }
+            } 
         });
     });
 }
