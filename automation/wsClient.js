@@ -21,7 +21,7 @@ wsClient.start = (ip)=> {
     rejectUnauthorized: false,
     key: privateKey,
     cert: certificate,
-    headers: { "authorization": validator.generateToken(), "client-id": "BI_COMPUTER" }
+    headers: { "authorization": validator.generateToken(), "client-id": process.env.COMPUTER_NAME }
   });
 
   wss.on('open', function () {
