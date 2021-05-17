@@ -59,19 +59,8 @@ wsClient.start = (ip, st) => {
         unlock()
         break;
       case "ws-restart":
-        setTimeout(() => {
-          wsClient.stop()
-          gralUtils.getGitProps((localhost, remotehost, status) => {
-            if (status == "wifi") {
-              wsClient.start(localhost, status)
-            } else {
-              wsClient.start(remotehost, status)
-            }
-
-          });
-        }, 30000);
-
-        wss.send("Restarting in 30 seconds!")
+        evalueteStatuses()
+        wss.send("Restarting in 60 seconds!")
         break;
       default:
         text = "Action not recognized!";
@@ -117,6 +106,21 @@ function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+function evalueteStatuses(){
+  console.log("evaluating statuses git page not changed")
+  setTimeout(() => {
+    gralUtils.getGitProps((localhost, remotehost, status) => {
+      if (status != currentConnStatus){
+        let host = (status == "wifi")?localhost:remotehost
+        wsClient.start(host, status)
+      } else {
+        evalueteStatuses()
+      }
+
+    });
+  }, 60000);
 }
 
 module.exports = wsClient
