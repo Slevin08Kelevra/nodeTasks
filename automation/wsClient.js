@@ -80,7 +80,8 @@ wsClient.stop = () => {
 }
 
 wsClient.isConnected = () => {
-  return wss.readyState === WebSocket.OPEN
+
+  return wss  && wss.readyState === WebSocket.OPEN
 }
 
 function unlock() {
