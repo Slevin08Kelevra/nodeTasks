@@ -14,7 +14,7 @@ const wsClient = []
 var stopping = false;
 
 var wss
-wsClient.start = (ip)=> {
+wsClient.start = (ip) => {
   console.log('connecting')
   wss = new WebSocket(`wss://${ip}:8095`, {
     protocolVersion: 8,
@@ -31,7 +31,7 @@ wsClient.start = (ip)=> {
 
   wss.on('close', async function () {
     console.log('socket close');
-    if (!stopping){
+    if (!stopping) {
       await sleep(10000)
       wsClient.start()
     } else {
@@ -53,14 +53,19 @@ wsClient.start = (ip)=> {
         unlock()
         break;
       case "ws-restart":
-        wsClient.stop()
-        gralUtils.getGitProps((localhost, remotehost, status)=>{
-          if (status == "wifi"){
+        setTimeout(() => {
+          wsClient.stop()
+          gralUtils.getGitProps((localhost, remotehost, status) => {
+            if (status == "wifi") {
               wsClient.start(localhost)
-          } else {
+            } else {
               wsClient.start(remotehost)
-          }
-      })
+            }
+
+          });
+        }, 5000);
+
+        wss.send("Restarting in 5 seconds!")
         break;
       default:
         text = "Action not recognized!";
@@ -71,9 +76,9 @@ wsClient.start = (ip)=> {
 
 }
 
-wsClient.stop = ()=> {
-   stopping = true
-   wss.close()
+wsClient.stop = () => {
+  stopping = true
+  wss.close()
 }
 
 function unlock() {
@@ -106,6 +111,6 @@ function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-} 
+}
 
 module.exports = wsClient
