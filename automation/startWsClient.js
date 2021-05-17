@@ -1,5 +1,3 @@
-const cheerio = require('cheerio');
-const request = require('request');
 const wsClient = require('./wsClient');
 const gralUtils = require('./gralUtils')
 

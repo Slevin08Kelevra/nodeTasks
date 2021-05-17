@@ -7,6 +7,8 @@ const execAsync = promisify(exec);
 const moment = require('moment')
 const { networkInterfaces } = require('os');
 const nets = networkInterfaces();
+const cheerio = require('cheerio');
+const request = require('request');
 
 const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
