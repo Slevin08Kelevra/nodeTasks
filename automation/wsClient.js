@@ -51,6 +51,10 @@ wsClient.start = (ip)=> {
       case "unlock":
         unlock()
         break;
+      case "ws-restart":
+        wsClient.stop()
+        
+        break;
       default:
         text = "Action not recognized!";
     }
