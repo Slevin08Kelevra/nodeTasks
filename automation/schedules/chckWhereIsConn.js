@@ -6,7 +6,7 @@ const gralUtils = require("./../gralUtils");
 const awsUtils = require("./../awsUtils");
 const props = require('./../props')
 
-const wsConns
+var wsConns
 
 const findCentinel = (instance) => {
     return instance.name == 'centinel'
@@ -122,9 +122,8 @@ function writeFileFromTemplate(status, wifi, pepe) {
 }
 
 const checker = []
-const wsConns
 checker.setWsConns = (wc)=>{
-    wsConns = ws
+    wsConns = wc
 }
 
 module.exports = checker
