@@ -70,9 +70,9 @@ function checkPhoneConnected() {
                     })
                 }
 
-                if (!wsClient.isConnected()){
+                /* if (!wsClient.isConnected()){
                     wsClient.start(awsCentinelIpOld, "pepe")
-                 }
+                 } */
             }
 
         } else {
