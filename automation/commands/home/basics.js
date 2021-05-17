@@ -10,7 +10,7 @@ let home = {
     'smelly.cat.start': async ()=>{
         return ['ventilation start']
     },
-    'are.you.ok': async ()=>{
+    'are.you.ok': async (wsConns)=>{
         return await execute(wsConns, 'ruok')
     }
 }
