@@ -9,12 +9,15 @@ const { exec } = require('child_process');
 var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 
+const wsClient = []
+var stopping = false;
+
 var wss
-const connect = function () {
+wsClient.start = (ip)=> {
   console.log('connecting')
-  wss = new WebSocket('wss://192.168.1.132:8095', {
+  wss = new WebSocket(`wss://${ip}:8095`, {
     protocolVersion: 8,
-    origin: 'https://192.168.1.132:8095',
+    origin: `wss://${ip}:8095`,
     rejectUnauthorized: false,
     key: privateKey,
     cert: certificate,
@@ -27,9 +30,12 @@ const connect = function () {
 
   wss.on('close', async function () {
     console.log('socket close');
-    await sleep(10000)
-    connect()
-    
+    if (!stopping){
+      await sleep(10000)
+      wsClient.start()
+    } else {
+      stopping = false;
+    }
   });
 
   wss.on('error', function (error) {
@@ -54,7 +60,10 @@ const connect = function () {
 
 }
 
-connect()
+wsClient.stop = ()=> {
+   stopping = true
+   wss.close()
+}
 
 function unlock() {
   exec('node unlock.js Alvaro01Costarica', (err, stdout, stderr) => {
@@ -87,3 +96,5 @@ function sleep(ms) {
     setTimeout(resolve, ms);
   });
 } 
+
+module.exports = wsClient
