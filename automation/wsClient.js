@@ -16,7 +16,6 @@ var stopping = false;
 function noop() { }
 function heartbeat() {
   clearTimeout(this.pingTimeout);
-  //this.pong(noop)
   this.pingTimeout = setTimeout(() => {
     this.terminate();
   }, 30000 + 1000);
@@ -41,7 +40,6 @@ wsClient.start = (ip, st) => {
 
   wss.on('open', function () {
     clearTimeout(this.pingTimeout);
-    //this.pong(noop)
     this.pingTimeout = setTimeout(() => {
       this.terminate();
     }, 30000 + 1000);
@@ -56,7 +54,8 @@ wsClient.start = (ip, st) => {
     gralUtils.logInfo('socket client close');
     if (!stopping) {
       await sleep(10000)
-      wsClient.start(lastUsedIp, currentConnStatus)
+      let useIp = (lastUsedIp)?lastUsedIp:tryedIp
+      wsClient.start(useIp, currentConnStatus)
     } else {
       stopping = false;
     }
