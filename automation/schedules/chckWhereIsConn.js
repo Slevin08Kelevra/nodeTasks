@@ -65,17 +65,17 @@ function checkPhoneConnected() {
                         gralUtils.logInfo("centinel started!")
                         let awsCentinelIp = instData.map((inst) => { return inst.pubIp }).find(ip => true)
                         awsCentinelIpOld = awsCentinelIp
-                        wsClient.start(awsCentinelIp, "pepe")
+                        setTimeout(() => {
+                            wsClient.start(awsCentinelIp, "pepe")
+                        }, 60000);
                         writeFileFromTemplate("pepe", ubuntuIp, awsCentinelIp)
                     })
                 }
 
-                /* if (!wsClient.isConnected()){
-                    wsClient.start(awsCentinelIpOld, "pepe")
-                 } */
             }
 
         } else {
+            wsClient.stop()
             retrying = false
             retries = 0
             if (typeof phoneConnectedToWifi === 'undefined' || !phoneConnectedToWifi) {
@@ -124,7 +124,7 @@ function writeFileFromTemplate(status, wifi, pepe) {
                     message = error
                 }
 
-                console.log(message)
+                gralUtils.logInfo(message)
             }
         });
     });

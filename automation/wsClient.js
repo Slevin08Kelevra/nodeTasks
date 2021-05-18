@@ -20,7 +20,7 @@ var wss
 wsClient.start = (ip, st) => {
   currentConnStatus = st
   tryedIp = ip
-  console.log('connecting')
+  gralUtils.logInfo('connecting ws to ' + ip)
   wss = new WebSocket(`wss://${ip}:8095`, {
     protocolVersion: 8,
     origin: `wss://${ip}:8095`,
@@ -32,11 +32,11 @@ wsClient.start = (ip, st) => {
 
   wss.on('open', function () {
     lastUsedIp = tryedIp
-    console.log('socket open');
+    gralUtils.logInfo('socket client open');
   });
 
   wss.on('close', async function () {
-    console.log('socket close');
+    gralUtils.logInfo('socket client close');
     if (!stopping) {
       await sleep(10000)
       wsClient.start(lastUsedIp, currentConnStatus)
@@ -46,7 +46,7 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('error', function (error) {
-    console.log(error.message)
+    gralUtils.logError("Socket client error: " + error.message)
   });
 
   wss.on('message', function incoming(action) {
@@ -69,14 +69,16 @@ wsClient.start = (ip, st) => {
         text = "Action not recognized!";
     }
 
-    console.log("doing: " + action);
+    gralUtils.logInfo("Exec action: " + action);
   });
 
 }
 
 wsClient.stop = () => {
-  stopping = true
-  wss.close()
+  if (wss){
+    stopping = true
+    wss.close()
+  }
 }
 
 wsClient.isConnected = () => {
@@ -87,7 +89,7 @@ wsClient.isConnected = () => {
 function unlock() {
   exec('node unlock.js Alvaro01Costarica', (err, stdout, stderr) => {
     if (err) {
-      console.error(err);
+      gralUtils.logError(err);
       return;
     }
     wss.send(stdout)
@@ -105,7 +107,7 @@ function showMyInf() {
     ks.sendCombination(['control', 'v']);
     wss.send("key sent!!!")
   }).catch(err => {
-    console.log(err);
+    gralUtils.logError(err);
     ps.dispose();
   });
 }
@@ -117,7 +119,7 @@ function sleep(ms) {
 }
 
 function evalueteStatuses(){
-  console.log("evaluating statuses git page not changed")
+  gralUtils.logInfo("evaluating statuses git page not changed")
   setTimeout(() => {
     gralUtils.getGitProps((localhost, remotehost, status) => {
       if (status != currentConnStatus){
