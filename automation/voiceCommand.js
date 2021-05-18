@@ -106,7 +106,7 @@ const interval = setInterval(function ping() {
       if (ws.isAlive === false) return ws.terminate();
   
       ws.isAlive = false;
-      ws.ping(noop);
+      //ws.ping(noop);
     });
   }, 30000);
 
