@@ -113,8 +113,8 @@ function writeFileFromTemplate(status, wifi, pepe) {
         fs.writeFile(destFile, result, 'utf8', async (err) => {
             if (err) return gralUtils.logError(err);
             await git.add('./props.html').commit("Changing data!").push();
-            //poner solo si es pepe!!!!!
-            if (wsConns.get("BI_COMPUTER")) {
+            
+            if (wsConns.get("BI_COMPUTER") && status === "pepe") {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
                 ws.send("ws-restart")
                 let message = ""
