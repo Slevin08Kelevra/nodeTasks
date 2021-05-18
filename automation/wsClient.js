@@ -16,7 +16,7 @@ var stopping = false;
 function noop() { }
 function heartbeat() {
   clearTimeout(this.pingTimeout);
-  this.pong(noop)
+  //this.pong(noop)
   this.pingTimeout = setTimeout(() => {
     this.terminate();
   }, 30000 + 1000);
