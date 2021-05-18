@@ -13,7 +13,7 @@ var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 const wsClient = []
 var stopping = false;
 
-function noop() {}
+function noop() { }
 function heartbeat() {
   clearTimeout(this.pingTimeout);
   this.pong(noop)
@@ -41,10 +41,10 @@ wsClient.start = (ip, st) => {
 
   wss.on('open', function () {
     clearTimeout(this.pingTimeout);
-  this.pong(noop)
-  this.pingTimeout = setTimeout(() => {
-    this.terminate();
-  }, 30000 + 1000);
+    //this.pong(noop)
+    this.pingTimeout = setTimeout(() => {
+      this.terminate();
+    }, 30000 + 1000);
     lastUsedIp = tryedIp
     gralUtils.logInfo('socket client open');
   });
@@ -92,7 +92,7 @@ wsClient.start = (ip, st) => {
 }
 
 wsClient.stop = () => {
-  if (wss){
+  if (wss) {
     stopping = true
     wss.close()
   }
@@ -100,7 +100,7 @@ wsClient.stop = () => {
 
 wsClient.isConnected = () => {
 
-  return wss  && wss.readyState === WebSocket.OPEN
+  return wss && wss.readyState === WebSocket.OPEN
 }
 
 function unlock() {
@@ -135,12 +135,12 @@ function sleep(ms) {
   });
 }
 
-function evalueteStatuses(){
+function evalueteStatuses() {
   gralUtils.logInfo("evaluating statuses git page not changed")
   setTimeout(() => {
     gralUtils.getGitProps((localhost, remotehost, status) => {
-      if (status != currentConnStatus){
-        let host = (status == "wifi")?localhost:remotehost
+      if (status != currentConnStatus) {
+        let host = (status == "wifi") ? localhost : remotehost
         wsClient.start(host, status)
       } else {
         evalueteStatuses()
