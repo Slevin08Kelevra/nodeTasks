@@ -47,7 +47,7 @@ wsClient.start = (ip, st) => {
     gralUtils.logInfo('socket client open');
   });
 
-  wss.on('ping', heartbeat);
+  //wss.on('ping', heartbeat);
 
   wss.on('close', async function () {
     clearTimeout(this.pingTimeout);
