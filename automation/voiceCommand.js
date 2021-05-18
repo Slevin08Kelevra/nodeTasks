@@ -25,6 +25,10 @@ var server = https.createServer(options, app)
 
 const wsConns = new Map();
 checker.setWsConns(wsConns)
+function noop() {}
+function heartbeat() {
+  this.isAlive = true;
+}
 const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: async (info, callback) => {
@@ -74,6 +78,9 @@ const respObserver = (timeout, errMessage) => {
 }
 wss.on('connection', function connection(ws, req) {
 
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
+
     gralUtils.logInfo("ws connected") 
     let clientId = req.headers['client-id']
     let obs = respObserver(4000, "web socket time out")
@@ -93,6 +100,19 @@ wss.on('connection', function connection(ws, req) {
         gralUtils.logError('ws error: ' + err);
     });
 });
+
+const interval = setInterval(function ping() {
+    wss.clients.forEach(function each(ws) {
+      if (ws.isAlive === false) return ws.terminate();
+  
+      ws.isAlive = false;
+      ws.ping(noop);
+    });
+  }, 30000);
+
+  wss.on('close', function close() {
+    clearInterval(interval);
+  });
 
 const toWords = new ToWords({
     localeCode: 'en-IN',

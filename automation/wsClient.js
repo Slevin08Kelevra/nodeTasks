@@ -13,6 +13,15 @@ var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 const wsClient = []
 var stopping = false;
 
+function noop() {}
+function heartbeat() {
+  clearTimeout(this.pingTimeout);
+  this.pong(noop)
+  this.pingTimeout = setTimeout(() => {
+    this.terminate();
+  }, 30000 + 1000);
+}
+
 var currentConnStatus
 var tryedIp
 var lastUsedIp
@@ -31,11 +40,15 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('open', function () {
+    heartbeat()
     lastUsedIp = tryedIp
     gralUtils.logInfo('socket client open');
   });
 
+  wss.on('ping', heartbeat);
+
   wss.on('close', async function () {
+    clearTimeout(this.pingTimeout);
     gralUtils.logInfo('socket client close');
     if (!stopping) {
       await sleep(10000)
