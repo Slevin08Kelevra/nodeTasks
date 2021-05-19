@@ -1,11 +1,16 @@
-const { networkInterfaces } = require('os');
-
-const nets = networkInterfaces();
-
-for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-        if (net.family === 'IPv4' && !net.internal) {
-            console.log(name + " " + net.address)
-        }
+const test = {
+    prop: 42,
+    test: "",
+    func: function(p) {
+      p();
+    },
+    sett: function(){
+        this.test = "hola"
     }
-}
+  };
+  
+  function print(){console.log(this.test)}
+
+  test.sett()
+  
+  test.func(print)

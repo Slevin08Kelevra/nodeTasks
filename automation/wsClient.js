@@ -39,8 +39,10 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('open', function () {
-    let hb = heartbeat
-    hb()
+    clearTimeout(this.pingTimeout);
+    this.pingTimeout = setTimeout(() => {
+      this.terminate();
+    }, 30000 + 1000);
     lastUsedIp = tryedIp
     gralUtils.logInfo('socket client open');
   });
