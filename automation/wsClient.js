@@ -21,10 +21,6 @@ function heartbeat() {
   }, 30000 + 1000);
 }
 
-function getHeartbeat(){
-  return heartbeat
-}
-
 var currentConnStatus
 var tryedIp
 var lastUsedIp
@@ -42,8 +38,8 @@ wsClient.start = (ip, st) => {
     headers: { "authorization": validator.generateToken(), "client-id": process.env.COMPUTER_NAME }
   });
 
-  wss.on('open', function () {
-    getHeartbeat()()
+  wss.on('open', function (heartbeat) {
+    heartbeat()
     lastUsedIp = tryedIp
     gralUtils.logInfo('socket client open');
   });
