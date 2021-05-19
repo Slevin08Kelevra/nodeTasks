@@ -80,9 +80,9 @@ wss.on('connection', function connection(ws, req) {
 
     ws.isAlive = true;
     ws.on('pong', heartbeat);
-
-    gralUtils.logInfo("ws connected") 
+ 
     let clientId = req.headers['client-id']
+    gralUtils.logInfo("ws connected " + clientId)
     let obs = respObserver(4000, "web socket time out")
     wsConns.set(clientId, {ws, obs})
 

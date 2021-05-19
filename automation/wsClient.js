@@ -21,6 +21,10 @@ function heartbeat() {
   }, 30000 + 1000);
 }
 
+function getHeartbeat(){
+  return heartbeat
+}
+
 var currentConnStatus
 var tryedIp
 var lastUsedIp
@@ -39,10 +43,7 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('open', function () {
-    clearTimeout(this.pingTimeout);
-    this.pingTimeout = setTimeout(() => {
-      this.terminate();
-    }, 30000 + 1000);
+    getHeartbeat()()
     lastUsedIp = tryedIp
     gralUtils.logInfo('socket client open');
   });
