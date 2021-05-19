@@ -38,10 +38,16 @@ wsClient.start = (ip, st) => {
     headers: { "authorization": validator.generateToken(), "client-id": process.env.COMPUTER_NAME }
   });
 
-  wss.on('open', function (heartbeat) {
-    heartbeat()
-    lastUsedIp = tryedIp
-    gralUtils.logInfo('socket client open');
+  function getOpenFunction(hb){
+    return ()=>{
+      hb()
+      lastUsedIp = tryedIp
+      gralUtils.logInfo('socket client open');
+    } 
+  }
+
+  wss.on('open', function () {
+    getOpenFunction(heartbeat)
   });
 
   wss.on('ping', heartbeat);
