@@ -46,9 +46,7 @@ wsClient.start = (ip, st) => {
     } 
   }
 
-  wss.on('open', function () {
-    getOpenFunction(heartbeat)
-  });
+  wss.on('open', getOpenFunction(heartbeat));
 
   wss.on('ping', heartbeat);
 
