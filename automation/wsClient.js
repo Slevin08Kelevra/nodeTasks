@@ -54,7 +54,7 @@ wsClient.start = (ip, st) => {
     gralUtils.logInfo('socket client close');
     if (!stopping) {
       await sleep(10000)
-      let useIp = (lastUsedIp)?lastUsedIp:tryedIp
+      let useIp = (lastUsedIp) ? lastUsedIp : tryedIp
       wsClient.start(useIp, currentConnStatus)
     } else {
       stopping = false;
@@ -67,12 +67,13 @@ wsClient.start = (ip, st) => {
 
   wss.on('message', function incoming(action) {
 
-    if (action.startsWith('connect2home:')){
+    if (action.startsWith('connect2home:')) {
       let ipAndstatus = action.replace("connect2home:", "").split(':')
+      gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
       wss.terminate()
       setTimeout(() => {
         wsClient.start(ipAndstatus[0], ipAndstatus[1])
-    }, 10000);
+      }, 10000);
     }
 
     switch (action) {

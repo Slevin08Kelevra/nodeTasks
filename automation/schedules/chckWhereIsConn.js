@@ -75,14 +75,16 @@ function checkPhoneConnected() {
             }
 
         } else {
-            wsClient.send(`BI-INSTRUCTION:connect2home:${ubuntuIp}:wifi`)
-            wsClient.stop()
             retrying = false
             retries = 0
             if (typeof phoneConnectedToWifi === 'undefined' || !phoneConnectedToWifi) {
                 phoneConnectedToWifi = true
                 gralUtils.logInfo("phone in home!")
 
+                wsClient.send(`BI-INSTRUCTION:connect2home:${ubuntuIp}:wifi`)
+                gralUtils.wait(8000)
+                wsClient.stop()
+                
                 let data = await awsUtils.shtudownAllInstances(findCentinel)
                 let ids = data.map((inst) => {
                     return inst.id
