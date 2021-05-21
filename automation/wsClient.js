@@ -70,7 +70,7 @@ wsClient.start = (ip, st) => {
     if (action.startsWith('connect2home:')) {
       let ipAndstatus = action.replace("connect2home:", "").split(':')
       gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
-      wss.terminate()
+      wsClient.stop()
       setTimeout(() => {
         wsClient.start(ipAndstatus[0], ipAndstatus[1])
       }, 10000);
