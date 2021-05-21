@@ -206,6 +206,7 @@ app.post('/send', async (req, res, next) => {
 
     let response
     response = await postHanler(req)
+    gralUtils.logInfo(JSON.stringify(response))
     res.json(response)
     
 })
