@@ -178,7 +178,7 @@ let postHanler = async (req) => {
     });
 
     if (cmdToRun.length > 1) {
-        gralUtils.logInfo('repeated commands')
+        gralUtils.logInfo('repeated commands  or similar, should print array')
         cmdToRun.forEach((cmd) => {
             gralUtils.logInfo(cmd)
         })
@@ -189,14 +189,17 @@ let postHanler = async (req) => {
     if (execEnabled) {
         execEnabled = false
         response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
-        delayAndEnableExec()
+        if (cmdToRun[0] !== "general.ping"){
+            delayAndEnableExec()
+            gralUtils.logInfo("do delayAndEnableExec")
+        }
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
         } else {
             response.appliedCmd = 'General phrase not found'
         }
     } else {
-        response.status = "repeated, repetition not allowed"
+        response.status = ["repeated, repetition not allowed"]
     }
 
     return response
@@ -223,7 +226,7 @@ app.use(function(req, res, next) {
 async function delayAndEnableExec() {
     setTimeout(function () {
         execEnabled = true
-    }, 5000);
+    }, 2000);
 };
 
 server.listen(8095, function () {
