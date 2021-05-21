@@ -76,6 +76,7 @@ const respObserver = (timeout, errMessage) => {
         }
     }
 }
+
 wss.on('connection', function connection(ws, req) {
 
     ws.isAlive = true;
@@ -92,8 +93,8 @@ wss.on('connection', function connection(ws, req) {
             if (!wsConns.get("BI_COMPUTER")) {
                 gralUtils.logInfo("BI_COMPUTER web client not connected!" )
             } else {
-                let { wsbi, obs } = wsConns.get("BI_COMPUTER")
-                wsbi.send(message.replace("BI-INSTRUCTION:", ""))
+                let { ws, obs } = wsConns.get("BI_COMPUTER")
+                ws.send(message.replace("BI-INSTRUCTION:", ""))
                 gralUtils.logInfo('Instruction to BI sent!')
             }
         } else {

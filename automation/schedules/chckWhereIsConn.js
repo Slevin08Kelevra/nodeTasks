@@ -82,9 +82,10 @@ function checkPhoneConnected() {
                 gralUtils.logInfo("phone in home!")
 
                 wsClient.send(`BI-INSTRUCTION:connect2home:${ubuntuIp}:wifi`)
-                gralUtils.wait(8000)
+                await gralUtils.wait(10000)
+                gralUtils.logInfo("Instructing BI to change to wifi and stoping ubuntu ws client")
                 wsClient.stop()
-                
+
                 let data = await awsUtils.shtudownAllInstances(findCentinel)
                 let ids = data.map((inst) => {
                     return inst.id
