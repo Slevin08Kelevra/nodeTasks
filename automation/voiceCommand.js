@@ -186,19 +186,17 @@ let postHanler = async (req) => {
     }
 
     let response = {}
-    if (execEnabled) {
+    if (execEnabled && cmdToRun[0] !== "general.ping") {
         execEnabled = false
         response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
-        if (cmdToRun[0] !== "general.ping"){
-            delayAndEnableExec()
-            gralUtils.logInfo("do delayAndEnableExec")
-        }
+        delayAndEnableExec()
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
         } else {
             response.appliedCmd = 'General phrase not found'
         }
     } else {
+        response.appliedCmd = "none"
         response.status = ["repeated, repetition not allowed"]
     }
 
