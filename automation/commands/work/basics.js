@@ -9,11 +9,11 @@ let basics = {
 
         return await execute(wsConns, 'unlock')
     },
-    'web socket restart': async (wsConns) => {
+    'web.socket.restart': async (wsConns) => {
 
         return await execute(wsConns, 'ws-restart')
     },
-    'are you alive': async (wsConns) => {
+    'are.you.alive': async (wsConns) => {
 
         return await execute(wsConns, 'rualive')
     }

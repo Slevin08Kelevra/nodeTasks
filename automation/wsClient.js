@@ -85,7 +85,7 @@ wsClient.start = (ip, st) => {
         break;
       case "ws-restart":
         evalueteStatuses()
-        wss.send("Restarting in 60 seconds!")
+        wss.send("BI comp ws restarting in 60 seconds!")
         break;
       case "ruok":
         wss.send("Ubuntu is fine, Sir!")

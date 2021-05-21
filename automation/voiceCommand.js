@@ -186,7 +186,7 @@ let postHanler = async (req) => {
     }
 
     let response = {}
-    if (execEnabled && cmdToRun[0] !== "general.ping") {
+    if (execEnabled || cmdToRun[0] === "general.ping") {
         execEnabled = false
         response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
         delayAndEnableExec()
