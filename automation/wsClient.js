@@ -81,6 +81,9 @@ wsClient.start = (ip, st) => {
       case "ruok":
         wss.send("Ubuntu is fine, Sir!")
         break;
+      case "rualive":
+        wss.send("bi comp is fine, Sir!")
+        break;
       default:
         text = "Action not recognized!";
     }
