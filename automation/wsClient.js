@@ -67,6 +67,14 @@ wsClient.start = (ip, st) => {
 
   wss.on('message', function incoming(action) {
 
+    if (action.startsWith('connect2home:')){
+      let ipAndstatus = action.replace("connect2home:", "").split(':')
+      wss.terminate()
+      setTimeout(() => {
+        wsClient.start(ipAndstatus[0], ipAndstatus[1])
+    }, 10000);
+    }
+
     switch (action) {
       case "showMyInf":
         showMyInf()
@@ -82,7 +90,7 @@ wsClient.start = (ip, st) => {
         wss.send("Ubuntu is fine, Sir!")
         break;
       case "rualive":
-        wss.send("bi comp is fine, Sir!")
+        wss.send("Bi comp is fine, Sir!")
         break;
       default:
         text = "Action not recognized!";
@@ -97,6 +105,12 @@ wsClient.stop = () => {
   if (wss) {
     stopping = true
     wss.close()
+  }
+}
+
+wsClient.send = (message) => {
+  if (wss) {
+    wss.send(message)
   }
 }
 

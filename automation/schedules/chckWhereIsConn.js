@@ -48,6 +48,7 @@ function checkPhoneConnected() {
         if (stdout.trim() != props.schedules.phone_mac) {
             retrying = true
             if (retries <= 3) {
+                wsClient.stop()
                 setTimeout(() => {
                     checkPhoneConnected()
                 }, 10000);
@@ -75,6 +76,7 @@ function checkPhoneConnected() {
             }
 
         } else {
+            wsClient.send(`BI-INSTRUCTION:connect2home:${ubuntuIp}:wifi`)
             wsClient.stop()
             retrying = false
             retries = 0

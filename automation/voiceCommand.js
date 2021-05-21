@@ -88,7 +88,17 @@ wss.on('connection', function connection(ws, req) {
 
     ws.on('message', function incoming(message) {
         gralUtils.logInfo("incomming ws msg: " + message)
-        obs.redirect(message)
+        if (message.startsWith('BI-INSTRUCTION:')){
+            if (!wsConns.get("BI_COMPUTER")) {
+                gralUtils.logInfo("BI_COMPUTER web client not connected!" )
+            } else {
+                let { wsbi, obs } = wsConns.get("BI_COMPUTER")
+                wsbi.send(message.replace("BI-INSTRUCTION:", ""))
+                gralUtils.logInfo('Instruction to BI sent!')
+            }
+        } else {
+            obs.redirect(message)
+        }
     });
 
     ws.on('close', function close() {
