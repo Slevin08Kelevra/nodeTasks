@@ -84,6 +84,7 @@ wsClient.start = (ip, st) => {
         unlock()
         break;
       case "ws-restart":
+        wsClient.stop()
         evalueteStatuses()
         wss.send("BI comp ws restarting in 60 seconds!")
         break;
