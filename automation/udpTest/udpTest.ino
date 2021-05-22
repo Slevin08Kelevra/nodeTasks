@@ -9,26 +9,19 @@
 // UDP
 WiFiUDP UDP;
 char packet[255];
-char reply[] = "Packet received!";
-char repTrue[] = "true";
-char repFalse[] = "false";
-
-#define uno 20
-#define dos 19
-#define tres 18
-#define cuatro 17
+char reply[] = "0:0:0:0";
 
 bool s1 = false;
 bool s2 = false;
 bool s3 = false;
-bool s4 = false;
+bool s0 = false;
 
 void setup() {
   // Setup serial port
   Serial.begin(115200);
   Serial.println();
 
-  // Begin WiFi
+  WiFi.setOutputPower(5);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   // Connecting to WiFi...
@@ -68,7 +61,7 @@ void setup() {
 
 void loop() {
 
-  // If packet received...
+  bool doSomeThing = false;
   int packetSize = UDP.parsePacket();
   if (packetSize) {
     Serial.print("Received packet! Size: ");
@@ -83,35 +76,58 @@ void loop() {
 
     String cmd = charToString(packet);
 
+    doSomeThing = (cmd.startsWith("SWITCH_")) ? true : false;
+
     if (cmd == "SWITCH_1_ON") {
       digitalWrite(D1, HIGH);
+      s1 = true;
     } else if (cmd == "SWITCH_1_OFF") {
       digitalWrite(D1, LOW);
+      s1 = false;
     } else if (cmd == "SWITCH_2_ON") {
       digitalWrite(D2, HIGH);
+      s2 = true;
     } else if (cmd == "SWITCH_2_OFF") {
       digitalWrite(D2, LOW);
+      s2 = false;
     } else if (cmd == "SWITCH_3_ON") {
       digitalWrite(D3, HIGH);
+      s3 = true;
     } else if (cmd == "SWITCH_3_OFF") {
       digitalWrite(D3, LOW);
+      s3 = false;
     } else if (cmd == "SWITCH_4_ON") {
       digitalWrite(D0, HIGH);
+      s0 = true;
     } else if (cmd == "SWITCH_4_OFF") {
       digitalWrite(D0, LOW);
+      s0 = false;
+    } else if (cmd == "SWITCH_STATUS") {
+      //DO NOTHING
+    } else {
+      doSomeThing = false;
     }
 
-    // Send return packet
-    IPAddress ip = WiFi.localIP();
-    ip[3] = 255;
-    UDP.beginPacket(ip, 8284);
-    //UDP.beginPacket(UDP.remoteIP(), 8284);
-    Serial.println("pasa por aqui");
-    UDP.write(reply);
-    UDP.endPacket();
+    if (doSomeThing) {
+      IPAddress ip = WiFi.localIP();
+      ip[3] = 255;
+      UDP.beginPacket(ip, 8284);
+
+      Serial.println("pasa por aqui");
+      String resutl = String(s1);
+
+      reply[0] = (s0) ? '1' : '0';
+      reply[2] = (s1) ? '1' : '0';
+      reply[4] = (s2) ? '1' : '0';
+      reply[6] = (s3) ? '1' : '0';
+      UDP.write(reply);
+
+      UDP.endPacket();
+    }
 
   }
 
+  delay(4);
 }
 
 String charToString(const char S[])

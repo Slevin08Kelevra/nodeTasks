@@ -51,10 +51,10 @@ wsClient.start = (ip, st) => {
 
   wss.on('close', async function () {
     clearTimeout(this.pingTimeout);
-    gralUtils.logInfo('socket client close');
+    let useIp = (lastUsedIp) ? lastUsedIp : tryedIp
+    gralUtils.logInfo(`ws connection to ${useIp} closed`);
     if (!stopping) {
-      await sleep(10000)
-      let useIp = (lastUsedIp) ? lastUsedIp : tryedIp
+      await sleep(10000)   
       wsClient.start(useIp, currentConnStatus)
     } else {
       stopping = false;
@@ -103,6 +103,7 @@ wsClient.start = (ip, st) => {
 }
 
 wsClient.stop = () => {
+  lastUsedIp=null
   if (wss) {
     stopping = true
     wss.close()

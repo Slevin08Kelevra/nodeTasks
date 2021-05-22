@@ -33,11 +33,14 @@ const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: async (info, callback) => {
         try {
-            if ( wsConns.get(info.req.headers['client-id'])){
+            let clientId = info.req.headers['client-id']
+            let token = info.req.headers.authorization
+            if ( wsConns.get(clientId)){
+                gralUtils.logInfo(`${clientId} allready connected, so rejecting!`)
                 callback(false, 401, 'Unauthorized');
             }
-            if (await validator.isNotValid(info.req.headers.authorization)) {
-                gralUtils.logInfo("token not authorized: " + info.req.headers.authorization)
+            if (await validator.isNotValid(token)) {
+                gralUtils.logInfo(`token (${token}) not authorized from ${clientId}`)
                 callback(false, 401, 'Unauthorized');
             } else {
                 callback(true);
@@ -103,7 +106,7 @@ wss.on('connection', function connection(ws, req) {
     });
 
     ws.on('close', function close() {
-        gralUtils.logInfo(clientId +  ' closed')
+        gralUtils.logInfo(clientId +  ' ws closed')
         wsConns.delete(clientId)
     });
 
