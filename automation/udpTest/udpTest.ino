@@ -14,35 +14,9 @@ char reply[] = "0:0:0:0";
 bool s1 = false;
 bool s2 = false;
 bool s3 = false;
-bool s0 = false;
+bool s4 = false;
 
 void setup() {
-  // Setup serial port
-  Serial.begin(115200);
-  Serial.println();
-
-  WiFi.setOutputPower(5);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  // Connecting to WiFi...
-  Serial.print("Connecting to ");
-  Serial.print(WIFI_SSID);
-  // Loop continuously while WiFi is not connected
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(100);
-    Serial.print(".");
-  }
-
-  // Connected to WiFi
-  Serial.println();
-  Serial.print("Connected! IP address: ");
-  Serial.println(WiFi.localIP());
-
-  // Begin listening to UDP port
-  UDP.begin(UDP_PORT);
-  Serial.print("Listening on UDP port ");
-  Serial.println(UDP_PORT);
 
   pinMode(D1, OUTPUT);
   delay(100);
@@ -50,12 +24,41 @@ void setup() {
   pinMode(D2, OUTPUT);
   delay(100);
   digitalWrite(D2, LOW);
-  pinMode(D3, OUTPUT);
+  pinMode(D5, OUTPUT);
   delay(100);
-  digitalWrite(D3, LOW);
-  pinMode(D0, OUTPUT);
+  digitalWrite(D5, LOW);
+  pinMode(D6, OUTPUT);
   delay(100);
-  digitalWrite(D0, LOW);
+  digitalWrite(D6, LOW);
+  
+  // Setup serial port
+  Serial.begin(115200);
+  //Serial.println();
+
+  WiFi.setOutputPower(5);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+  // Connecting to WiFi...
+  //Serial.print("Connecting to ");
+  //Serial.print(WIFI_SSID);
+  // Loop continuously while WiFi is not connected
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(100);
+    //Serial.print(".");
+  }
+
+  // Connected to WiFi
+  //Serial.println();
+  //Serial.print("Connected! IP address: ");
+  //Serial.println(WiFi.localIP());
+
+  // Begin listening to UDP port
+  UDP.begin(UDP_PORT);
+  //Serial.print("Listening on UDP port ");
+  //Serial.println(UDP_PORT);
+
+  
 
 }
 
@@ -64,15 +67,15 @@ void loop() {
   bool doSomeThing = false;
   int packetSize = UDP.parsePacket();
   if (packetSize) {
-    Serial.print("Received packet! Size: ");
-    Serial.println(packetSize);
+    //Serial.print("Received packet! Size: ");
+    //Serial.println(packetSize);
     int len = UDP.read(packet, 255);
     if (len > 0)
     {
       packet[len] = '\0';
     }
-    Serial.print("Packet received: ");
-    Serial.println(packet);
+    //Serial.print("Packet received: ");
+    //Serial.println(packet);
 
     String cmd = charToString(packet);
 
@@ -91,17 +94,17 @@ void loop() {
       digitalWrite(D2, LOW);
       s2 = false;
     } else if (cmd == "SWITCH_3_ON") {
-      digitalWrite(D3, HIGH);
+      digitalWrite(D5, HIGH);
       s3 = true;
     } else if (cmd == "SWITCH_3_OFF") {
-      digitalWrite(D3, LOW);
+      digitalWrite(D5, LOW);
       s3 = false;
     } else if (cmd == "SWITCH_4_ON") {
-      digitalWrite(D0, HIGH);
-      s0 = true;
+      digitalWrite(D6, HIGH);
+      s4 = true;
     } else if (cmd == "SWITCH_4_OFF") {
-      digitalWrite(D0, LOW);
-      s0 = false;
+      digitalWrite(D6, LOW);
+      s4 = false;
     } else if (cmd == "SWITCH_STATUS") {
       //DO NOTHING
     } else {
@@ -113,13 +116,13 @@ void loop() {
       ip[3] = 255;
       UDP.beginPacket(ip, 8284);
 
-      Serial.println("pasa por aqui");
+      //Serial.println("pasa por aqui");
       String resutl = String(s1);
 
-      reply[0] = (s0) ? '1' : '0';
-      reply[2] = (s1) ? '1' : '0';
-      reply[4] = (s2) ? '1' : '0';
-      reply[6] = (s3) ? '1' : '0';
+      reply[0] = (s1) ? '1' : '0';
+      reply[2] = (s2) ? '1' : '0';
+      reply[4] = (s3) ? '1' : '0';
+      reply[6] = (s4) ? '1' : '0';
       UDP.write(reply);
 
       UDP.endPacket();
