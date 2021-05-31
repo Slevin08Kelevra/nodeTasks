@@ -1,3 +1,5 @@
+const udpTransceiver = require('./../../udpTransceiver')
+const udpt = udpTransceiver(8284, 8285, 8286)
 
 let home = {
 
@@ -7,8 +9,19 @@ let home = {
     'ventilation.start': async ()=>{
         return ['ventilation start']
     },
+    'switch.status': async ()=>{
+        let message = await udpt.sendWithRetry("SWITCH_STATUS")
+        return [message]
+    },
     'smelly.cat.start': async ()=>{
-        return ['ventilation start']
+        let message = await udpt.sendWithRetry("SWITCH_1_ON")
+        return [message]
+        //return ['ventilation start']
+    },
+    'smelly.cat.stop': async ()=>{
+        let message = await udpt.sendWithRetry("SWITCH_1_OFF")
+        return [message]
+        //return ['ventilation start']
     },
     'are.you.ok': async (wsConns)=>{
         return await execute(wsConns, 'ruok')

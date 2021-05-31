@@ -191,7 +191,9 @@ let postHanler = async (req) => {
 
     let response = {}
     if (execEnabled || cmdToRun[0] === "general.ping") {
-        execEnabled = false
+        if (cmdToRun[0] !== "general.ping"){
+            execEnabled = false
+        }  
         response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
         delayAndEnableExec()
         if (cmdToRun[0]) {
@@ -228,7 +230,7 @@ app.use(function(req, res, next) {
 async function delayAndEnableExec() {
     setTimeout(function () {
         execEnabled = true
-    }, 2000);
+    }, 1500);
 };
 
 server.listen(8095, function () {

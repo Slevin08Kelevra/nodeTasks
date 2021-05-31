@@ -47,10 +47,10 @@ function checkPhoneConnected() {
         }
         if (stdout.trim() != props.schedules.phone_mac) {
             retrying = true
-            if (retries <= 3) {
+            if (retries <= 4) {
                 setTimeout(() => {
                     checkPhoneConnected()
-                }, 10000);
+                }, 12000);
             } else {
                 retrying = false
                 retries = 0
