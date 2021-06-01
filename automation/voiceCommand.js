@@ -5,6 +5,7 @@ const express = require('express');
 const app = express();
 const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
+const allKeys = commands.allKeys
 const { ToWords } = require('to-words');
 const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator");
@@ -194,7 +195,7 @@ let postHanler = async (req) => {
         if (cmdToRun[0] !== "general.ping"){
             execEnabled = false
         }  
-        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns)
+        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns, allKeys)
         delayAndEnableExec()
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')

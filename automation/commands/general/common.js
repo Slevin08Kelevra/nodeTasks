@@ -10,6 +10,9 @@ let common = {
     },
     'ping': async ()=>{
         return ['pong']
+    },
+    'what.can.i.do': async (wsConns, allKeys)=>{
+        return allKeys
     }
 }
 

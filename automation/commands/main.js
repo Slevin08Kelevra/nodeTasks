@@ -4,6 +4,7 @@ const fs = require("fs");
 var myPath = path.join(__dirname, "");
 var base = {};
 base.phraseKeyMap = {}
+base.allKeys = []
 fs.readdirSync(myPath).forEach(function (folder) {
     let subDir = path.resolve(myPath, folder)
     if (fs.statSync(subDir).isDirectory()) {
@@ -24,6 +25,7 @@ function extend(obj, src, folder) {
         let spreadKey = key.replace(/\./g, ' ')
         let fixedKey = `${folder}.${key}`
         base.phraseKeyMap[`${folder} ${spreadKey}`] = fixedKey
+        base.allKeys.push(`${folder} ${spreadKey}`)
         obj[fixedKey] = src[key]; 
     });
     
