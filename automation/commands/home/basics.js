@@ -25,6 +25,14 @@ let home = {
     },
     'are.you.ok': async (wsConns)=>{
         return await execute(wsConns, 'ruok')
+    },
+    'REGEX:ac.(?<arg1>[1-4]{1}).(?<arg2>on|off)': async (wsConns, allKeys, args)=>{
+        let cmd
+        let reg2 = args.regex_2.toUpperCase()
+        cmd = `SWITCH_${args.regex_1}_${reg2}`
+        let message = await udpt.sendWithRetry(cmd)
+
+        return ['got it ' + message]
     }
 }
 

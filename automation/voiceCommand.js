@@ -7,6 +7,7 @@ const commands = require('./commands/main.js');
 const phraseKeyMap = commands.phraseKeyMap
 const allKeys = commands.allKeys
 const { ToWords } = require('to-words');
+const { wordsToNumbers } = require('words-to-numbers');
 const stringSimilarity = require("string-similarity");
 const validator = require("./reqValidator");
 const gralUtils = require("./gralUtils");
@@ -24,6 +25,7 @@ var options = {
 };
 var server = https.createServer(options, app)
 
+const args = {}
 const wsConns = new Map();
 checker.setWsConns(wsConns)
 function noop() {}
@@ -162,9 +164,10 @@ let postHanler = async (req) => {
     let possibleCmds = req.body.possibleMessages
     let fixedCmds = possibleCmds.map((cmd) => {
         let voiceCmd = cmd.toLowerCase()
-        voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number) => {
-            return toWords.convert(Number(number))
-        })
+        // voiceCmd = voiceCmd.replace(/([0-9]+)/g, (number) => {
+        //     return toWords.convert(Number(number))
+        // })
+        voiceCmd = wordsToNumbers(voiceCmd)
         gralUtils.logInfo("voice cmd: " + voiceCmd)
         return voiceCmd
     })
@@ -173,11 +176,25 @@ let postHanler = async (req) => {
     let index = 0
     Object.keys(phraseKeyMap).forEach(function (phrase) {
         fixedCmds.some(voiceCmd => {
-            var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
-            if (similarity > 0.85) {
-                gralUtils.logInfo(similarity);
+            if (phrase.includes('REGEX:')){
+               let phraseOk = phrase.replace(/\REGEX:/,'');
+               phraseOk = `^${phraseOk}$`
+               console.log("-" + phraseOk + "-" + voiceCmd + "-")
+               let matched = voiceCmd.match(new RegExp(phraseOk))
+               if (matched){
+                args.regex_1 = matched.groups.arg1
+                args.regex_2 = matched.groups.arg2
+                gralUtils.logInfo("Reg exp matched");
                 cmdToRun[index++] = phraseKeyMap[phrase]
                 return true
+               }
+            } else {
+                var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
+                if (similarity > 0.85) {
+                    gralUtils.logInfo(similarity);
+                    cmdToRun[index++] = phraseKeyMap[phrase]
+                    return true
+                }
             }
         })
     });
@@ -195,7 +212,7 @@ let postHanler = async (req) => {
         if (cmdToRun[0] !== "general.ping"){
             execEnabled = false
         }  
-        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns, allKeys)
+        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns, allKeys, args)
         delayAndEnableExec()
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
