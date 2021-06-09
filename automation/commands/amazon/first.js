@@ -49,6 +49,12 @@ const amazon = {
             return `${inst.id} -> ${inst.status}`
         })
     },
+    'create.instance': async () => {
+
+        let data = await awsUtils.runInstance()
+
+        return [data]
+    },
     'fix local hosts': async () => {
         let instancesList = await awsUtils.describeFiltered()
         getFixHostsFunc(instancesList)()

@@ -179,7 +179,7 @@ let postHanler = async (req) => {
             if (phrase.includes('REGEX:')){
                let phraseOk = phrase.replace(/\REGEX:/,'');
                phraseOk = `^${phraseOk}$`
-               console.log("-" + phraseOk + "-" + voiceCmd + "-")
+               //console.log("-" + phraseOk + "-" + voiceCmd + "-")
                let matched = voiceCmd.match(new RegExp(phraseOk))
                if (matched){
                 args.regex_1 = matched.groups.arg1

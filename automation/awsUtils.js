@@ -17,7 +17,32 @@ const params = {
 
 const ec2 = new AWS.EC2({ region: 'us-east-2' });
 
+var instanceParamsTemplate = {
+    ImageId: 'ami-060510a828169166e', //AMI ID that will be used to create the instance
+    InstanceType: 't2.micro',
+    KeyName: 'firstKey',
+    MaxCount: 1,
+    MinCount: 1,
+    SecurityGroupIds: [
+        'sg-09782e916cc91667e'
+    ],
+ };
+
 const awsUtils = []
+
+awsUtils.runInstance = async () => {
+    return new Promise((resolve, reject) => {
+        ec2.runInstances(instanceParamsTemplate, function (err, data){
+            if (err) {
+                console.log(err, err.stack);
+                reject(err)
+            }
+            else {
+                resolve('Instance created!')
+            }
+        })
+    })
+}
 
 awsUtils.describeAll = async () => {
     return new Promise((resolve, reject) => {
