@@ -33,6 +33,10 @@ let home = {
         let message = await udpt.sendWithRetry(cmd)
 
         return ['got it ' + message]
+    },
+    'switch.status': async (wsConns, allKeys, args)=>{
+        let message = await udpt.sendWithRetry("SWITCH_STATUS")
+        return [message]
     }
 }
 

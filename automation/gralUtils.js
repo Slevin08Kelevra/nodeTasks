@@ -1,5 +1,5 @@
 const rexec = require('remote-exec');
-const  fs = require('fs')
+const fs = require('fs')
 const props = require('./props.js')
 const { exec } = require('child_process');
 const { promisify } = require('util');
@@ -22,7 +22,7 @@ var connection_options = {
 
 gralUtils.executeInRemote = async (hosts, cmds) => {
     return new Promise((resolve, reject) => {
-        rexec(hosts, cmds, connection_options, function(err){
+        rexec(hosts, cmds, connection_options, function (err) {
             if (err) {
                 console.log(err);
                 reject(err)
@@ -43,12 +43,12 @@ gralUtils.executeInLocal = async (cmd) => {
     console.log(`Command: (${cmd}) -> OK`)
 }
 
-gralUtils.logInfo = async(msg) => {
+gralUtils.logInfo = async (msg) => {
     let date = moment().format(dateFormat)
     console.log(date + " -> " + msg)
 }
 
-gralUtils.logError = async(msg) => {
+gralUtils.logError = async (msg) => {
     let date = moment().format(dateFormat)
     console.error(date + " -> " + msg)
 }
@@ -65,25 +65,34 @@ gralUtils.getLocalIp = () => {
     return 0
 }
 
-gralUtils.getGitProps = (action)=> {
-    request({
-        method: 'GET',
-        url: 'https://raw.githubusercontent.com/Slevin08Kelevra/nodeTasks/props/props.html'
-    }, (err, res, body) => {
-    
-        if (err) return console.error(err);
-    
-        let $ = cheerio.load(body);
-    
-        let localhost = $('input[name=lh]').val();
-        let remotehost = $('input[name=rh]').val();
-        let status = $('input[name=st]').val();
-    
-        action(localhost, remotehost, status)
-    
-    });
+gralUtils.getGitProps = (action) => {
+    request
+        .get('https://raw.githubusercontent.com/Slevin08Kelevra/nodeTasks/props/props.html')
+        .on('response', async (response) => {
+            if (response.statusCode == 200) {
+                response.on('data', (data) => {
+                    let $ = cheerio.load(data);
+
+                    let localhost = $('input[name=lh]').val();
+                    let remotehost = $('input[name=rh]').val();
+                    let status = $('input[name=st]').val();
+
+                    action(localhost, remotehost, status)
+                })
+            } else {
+                console.log("Not OK resp, Waiting 5 secs and retrying")
+                await gralUtils.wait(5000)
+                gralUtils.getGitProps(action)
+            }
+
+        }).on('error', async (err) => {
+            console.log("Error geting git props: " + err)
+            console.log("Waiting 5 secs and retrying")
+            await gralUtils.wait(5000)
+            gralUtils.getGitProps(action)
+        })
 }
 
-gralUtils.wait = ms=>new Promise(resolve => setTimeout(resolve, ms));
+gralUtils.wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 module.exports = gralUtils
