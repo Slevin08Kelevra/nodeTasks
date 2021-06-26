@@ -1,4 +1,5 @@
 
+const gralUtils = require('./../../gralUtils.js')
 
 let common = {
 
@@ -13,6 +14,12 @@ let common = {
     },
     'what.can.i.do': async (wsConns, allKeys)=>{
         return allKeys
+    },
+    'restart.application': async (wsConns, allKeys)=>{
+
+        let result = gralUtils.retartApp()
+
+        return [result]
     }
 }
 
