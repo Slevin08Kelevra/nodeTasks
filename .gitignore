@@ -1,6 +1,5 @@
 **/node_modules
 **/package-lock.json
-**/package.json
 
 automation/reqValidator.js
 automation/Automation.postman_collection.json

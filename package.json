@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "queue-fifo": "^0.2.6",
+    "to-words": "^2.3.1"
+  }
+}
