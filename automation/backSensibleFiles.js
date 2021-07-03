@@ -18,9 +18,13 @@ zip.addFile("/home/pablo/Documents/repos/nodeTasks/automation/Automation.postman
 //zip.addFolder("path/to/folder");
 
 zip.archive("/home/pablo/Documents/repos/sensibleBack/back.zip").then(function () {
-    console.log("done");
+    fs.copyFile('/home/pablo/Documents/repos/sensibleBack/back.zip', '/home/pablo/Dropbox/tasVids/back.zip', (err) => {
+        if (err) throw err;
+        console.log("done");
+      });
 }, function (err) {
     console.log(err);
 });
 
 //zip --encrypt back.kript.zip back.zip
+// /home/pablo/Dropbox/tasVids
