@@ -78,7 +78,7 @@ wsClient.start = (ip, st) => {
 
     switch (action) {
       case "showMyInf":
-        showMyInf()
+        showMyInf2()
         break;
       case "unlock":
         unlock()
@@ -146,6 +146,17 @@ function showMyInf() {
     gralUtils.logError(err);
     ps.dispose();
   });
+}
+
+function showMyInf2() {
+  
+  fs.readFile('C:\\Users\\paparini\\Documents\\myinfo.txt', 'utf8' , (err, data) => {
+    if (err) {
+      gralUtils.logError(err)
+      return
+    }
+    wss.send(data)
+  })
 }
 
 function sleep(ms) {
