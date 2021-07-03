@@ -78,6 +78,9 @@ wsClient.start = (ip, st) => {
 
     switch (action) {
       case "showMyInf":
+        showMyInf()
+        break;
+      case "showMyInf2":
         showMyInf2()
         break;
       case "unlock":
@@ -165,6 +168,7 @@ function sleep(ms) {
   });
 }
 
+// TO DO: check 10 times or so and go back to wifi or find a way to check the current status is ok
 function evalueteStatuses() {
   gralUtils.logInfo("evaluating statuses git page not changed")
   setTimeout(() => {

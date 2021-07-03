@@ -1,8 +1,15 @@
 let basics = {
 
-    'release.my.information': async (wsConns) => {
+    'print.my.information': async (wsConns) => {
 
         return await execute(wsConns, 'showMyInf')
+
+    },
+    'release.my.information': async (wsConns) => {
+
+        let info =  await execute(wsConns, 'showMyInf2')
+        let splitData = info[0].split("\n")
+        return splitData
 
     },
     'unlock': async (wsConns) => {
