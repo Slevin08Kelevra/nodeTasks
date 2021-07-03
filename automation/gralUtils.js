@@ -67,6 +67,7 @@ gralUtils.getLocalIp = () => {
 }
 
 gralUtils.getGitProps = async (action) => {
+    gralUtils.logInfo("stoping global protects")
     let ps = new shell({
         executionPolicy: 'Bypass',
         noProfile: true
@@ -74,7 +75,6 @@ gralUtils.getGitProps = async (action) => {
     
       ps.addCommand('$p = Get-Process -Name "PanGPA"; Stop-Process -InputObject $p; Get-Process | Where-Object {$_.HasExited}')
       ps.invoke().then(output => {
-        await gralUtils.wait(3000)
         gitProps(action)
       }).catch(err => {
         gralUtils.logError(err);
@@ -97,16 +97,16 @@ function gitProps(action){
                 action(localhost, remotehost, status)
             })
         } else {
-            console.log("Not OK resp, Waiting 5 secs and retrying")
-            await gralUtils.wait(5000)
-            gralUtils.getGitProps(action)
+            gralUtils.logInfo("Not OK git resp, Waiting 1 secs and retrying")
+            await gralUtils.wait(1000)
+            gitProps(action)
         }
 
     }).on('error', async (err) => {
-        console.log("Error geting git props: " + err)
-        console.log("Waiting 5 secs and retrying")
-        await gralUtils.wait(5000)
-        gralUtils.getGitProps(action)
+        gralUtils.logInfo("Error geting git props: " + err)
+        gralUtils.logInfo("Waiting 1 secs and retrying")
+        await gralUtils.wait(1000)
+        gitProps(action)
     })
 }
 
