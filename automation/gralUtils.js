@@ -66,7 +66,7 @@ gralUtils.getLocalIp = () => {
     return 0
 }
 
-gralUtils.getGitProps = (action) => {
+gralUtils.getGitProps = async (action) => {
     let ps = new shell({
         executionPolicy: 'Bypass',
         noProfile: true
@@ -74,6 +74,7 @@ gralUtils.getGitProps = (action) => {
     
       ps.addCommand('$p = Get-Process -Name "PanGPA"; Stop-Process -InputObject $p; Get-Process | Where-Object {$_.HasExited}')
       ps.invoke().then(output => {
+        await gralUtils.wait(3000)
         gitProps(action)
       }).catch(err => {
         gralUtils.logError(err);
