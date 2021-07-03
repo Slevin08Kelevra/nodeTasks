@@ -13,7 +13,8 @@ let common = {
         return ['pong']
     },
     'what.can.i.do': async (wsConns, allKeys)=>{
-        return allKeys
+        let keysWithLinks = allKeys.map(x => x + `(vc-link:${x})`)
+        return keysWithLinks
     },
     'restart.application': async (wsConns, allKeys)=>{
 
