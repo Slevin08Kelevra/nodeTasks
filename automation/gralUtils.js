@@ -9,6 +9,7 @@ const { networkInterfaces } = require('os');
 const nets = networkInterfaces();
 const cheerio = require('cheerio');
 const request = require('request');
+const shell = require('node-powershell');
 
 const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
@@ -66,31 +67,46 @@ gralUtils.getLocalIp = () => {
 }
 
 gralUtils.getGitProps = (action) => {
+    let ps = new shell({
+        executionPolicy: 'Bypass',
+        noProfile: true
+      });
+    
+      ps.addCommand('$p = Get-Process -Name "PanGPA"; Stop-Process -InputObject $p; Get-Process | Where-Object {$_.HasExited}')
+      ps.invoke().then(output => {
+        gitProps(action)
+      }).catch(err => {
+        gralUtils.logError(err);
+        ps.dispose();
+      });
+}
+
+function gitProps(action){
     request
-        .get('https://raw.githubusercontent.com/Slevin08Kelevra/nodeTasks/props/props.html')
-        .on('response', async (response) => {
-            if (response.statusCode == 200) {
-                response.on('data', (data) => {
-                    let $ = cheerio.load(data);
+    .get('https://raw.githubusercontent.com/Slevin08Kelevra/nodeTasks/props/props.html')
+    .on('response', async (response) => {
+        if (response.statusCode == 200) {
+            response.on('data', (data) => {
+                let $ = cheerio.load(data);
 
-                    let localhost = $('input[name=lh]').val();
-                    let remotehost = $('input[name=rh]').val();
-                    let status = $('input[name=st]').val();
+                let localhost = $('input[name=lh]').val();
+                let remotehost = $('input[name=rh]').val();
+                let status = $('input[name=st]').val();
 
-                    action(localhost, remotehost, status)
-                })
-            } else {
-                console.log("Not OK resp, Waiting 5 secs and retrying")
-                await gralUtils.wait(5000)
-                gralUtils.getGitProps(action)
-            }
-
-        }).on('error', async (err) => {
-            console.log("Error geting git props: " + err)
-            console.log("Waiting 5 secs and retrying")
+                action(localhost, remotehost, status)
+            })
+        } else {
+            console.log("Not OK resp, Waiting 5 secs and retrying")
             await gralUtils.wait(5000)
             gralUtils.getGitProps(action)
-        })
+        }
+
+    }).on('error', async (err) => {
+        console.log("Error geting git props: " + err)
+        console.log("Waiting 5 secs and retrying")
+        await gralUtils.wait(5000)
+        gralUtils.getGitProps(action)
+    })
 }
 
 gralUtils.wait = ms => new Promise(resolve => setTimeout(resolve, ms));
