@@ -92,10 +92,10 @@ wsClient.start = (ip, st) => {
         wss.send("BI comp ws restarting in 60 seconds!")
         break;
       case "ruok":
-        wss.send("Ubuntu is fine, Sir!")
+        wss.send("Ubuntu is fine, Sir!(vc-vib:2)")
         break;
       case "rualive":
-        wss.send("Bi comp is fine, Sir!")
+        wss.send("Bi comp is fine, Sir!(vc-vib:2)")
         break;
       default:
         text = "Action not recognized!";

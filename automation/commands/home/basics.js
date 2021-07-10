@@ -4,7 +4,7 @@ const udpt = udpTransceiver(8284, 8285, 8286)
 let home = {
 
     'unlock.the.gate': async ()=> {
-        return ['gate unlocked']
+        return ['gate unlocked(vc-vib:2)']
     },
     'ventilation.start': async ()=>{
         return ['ventilation start']
@@ -26,10 +26,11 @@ let home = {
     'are.you.ok': async (wsConns)=>{
         return await execute(wsConns, 'ruok')
     },
-    'REGEX:ac.(?<arg1>[1-4]{1}).(?<arg2>on|off)': async (wsConns, allKeys, args)=>{
+    'REGEX:ac.(?<arg0>[1-4]{1}).(?<arg1>on|off)': async (wsConns, allKeys, args)=>{
         let cmd
-        let reg2 = args.regex_2.toUpperCase()
-        cmd = `SWITCH_${args.regex_1}_${reg2}`
+        let reg2 = args[1].toUpperCase()
+        cmd = `SWITCH_${args[0]}_${reg2}`
+        console.log(cmd)
         let message = await udpt.sendWithRetry(cmd)
 
         return ['got it ' + message]
