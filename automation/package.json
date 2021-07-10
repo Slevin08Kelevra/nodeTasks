@@ -3,6 +3,7 @@
     "-": "^0.0.1",
     "aws-sdk": "^2.868.0",
     "cheerio": "^1.0.0-rc.9",
+    "crypto-secure-random-digit": "^1.0.9",
     "express": "^4.17.1",
     "fuzzyset.js": "^1.0.6",
     "g": "^2.0.1",

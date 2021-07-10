@@ -25,7 +25,7 @@ var options = {
 };
 var server = https.createServer(options, app)
 
-const args = {}
+const args = []
 const wsConns = new Map();
 checker.setWsConns(wsConns)
 function noop() {}
@@ -174,6 +174,7 @@ let postHanler = async (req) => {
 
     let cmdToRun = ['phrase.not.found']
     let index = 0
+    args.splice(0,args.length)
     Object.keys(phraseKeyMap).forEach(function (phrase) {
         fixedCmds.some(voiceCmd => {
             if (phrase.includes('REGEX:')){
@@ -182,8 +183,11 @@ let postHanler = async (req) => {
                //console.log("-" + phraseOk + "-" + voiceCmd + "-")
                let matched = voiceCmd.match(new RegExp(phraseOk))
                if (matched){
-                args.regex_1 = matched.groups.arg1
-                args.regex_2 = matched.groups.arg2
+                let varNum = 0
+                while (matched.groups['arg'+varNum]){
+                   args.push(matched.groups['arg'+varNum])
+                   ++varNum
+                }
                 gralUtils.logInfo("Reg exp matched");
                 cmdToRun[index++] = phraseKeyMap[phrase]
                 return true
