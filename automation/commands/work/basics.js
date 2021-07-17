@@ -23,6 +23,10 @@ let basics = {
     'are.you.alive': async (wsConns) => {
 
         return await execute(wsConns, 'rualive')
+    },
+    'restart.application': async (wsConns, allKeys) => {
+
+        return await execute(wsConns, 'restart-app')
     }
 
 }

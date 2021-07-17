@@ -54,7 +54,7 @@ wsClient.start = (ip, st) => {
     let useIp = (lastUsedIp) ? lastUsedIp : tryedIp
     gralUtils.logInfo(`ws connection to ${useIp} closed`);
     if (!stopping) {
-      await sleep(10000)   
+      await sleep(10000)
       wsClient.start(useIp, currentConnStatus)
     } else {
       stopping = false;
@@ -97,6 +97,9 @@ wsClient.start = (ip, st) => {
       case "rualive":
         wss.send("Bi comp is fine, Sir!(vc-vib:2)")
         break;
+      case "restart-app":
+        wss.send(gralUtils.retartApp())
+        break;
       default:
         text = "Action not recognized!";
     }
@@ -107,7 +110,7 @@ wsClient.start = (ip, st) => {
 }
 
 wsClient.stop = () => {
-  lastUsedIp=null
+  lastUsedIp = null
   if (wss) {
     stopping = true
     wss.close()
@@ -152,8 +155,8 @@ function showMyInf() {
 }
 
 function showMyInf2() {
-  
-  fs.readFile('C:\\Users\\paparini\\Documents\\myinfo.txt', 'utf8' , (err, data) => {
+
+  fs.readFile('C:\\Users\\paparini\\Documents\\myinfo.txt', 'utf8', (err, data) => {
     if (err) {
       gralUtils.logError(err)
       return
