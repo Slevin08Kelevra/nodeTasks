@@ -101,7 +101,7 @@ wsClient.start = (ip, st) => {
 
         setTimeout(() => {
           const time = new Date();
-          const filename = ".restart"
+          const filename = "restart.txt"
 
           try {
             fs.utimesSync(filename, time, time);
