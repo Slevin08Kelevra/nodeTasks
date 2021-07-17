@@ -98,7 +98,19 @@ wsClient.start = (ip, st) => {
         wss.send("Bi comp is fine, Sir!(vc-vib:2)")
         break;
       case "restart-app":
-        wss.send(gralUtils.retartApp())
+
+        setTimeout(() => {
+          const time = new Date();
+          const filename = ".restart"
+
+          try {
+            fs.utimesSync(filename, time, time);
+          } catch (err) {
+            fs.closeSync(fs.openSync(filename, 'w'));
+          }
+        }, 3000);
+        wss.send("Restarting in 3 secs!")
+
         break;
       default:
         text = "Action not recognized!";
