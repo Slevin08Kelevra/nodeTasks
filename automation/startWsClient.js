@@ -7,7 +7,7 @@ const fs = require('fs');
 let gitDirArr = __dirname.split('\\')
 gitDirArr.pop()
 let gitDir = gitDirArr.join('\\')
-gralUtils.logInfo('Git pull from ' + gitDir)
+gralUtils.logInfo('Git pull to ' + gitDir)
 let git = simpleGit(gitDir);
 git.pull((err, update) => {
     if(update && update.summary.changes) {
