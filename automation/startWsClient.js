@@ -23,7 +23,7 @@ git.pull((err, update) => {
 
         gralUtils.logInfo('Git pull changes, restarting app')
     } else {
-        gralUtils.logInfo('Git with no changes, keep as if')
+        gralUtils.logInfo('Git with no changes, keep as if.')
     }
 
     if (err) {
