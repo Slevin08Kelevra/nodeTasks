@@ -1,18 +1,19 @@
 const wsClient = require('./wsClient');
 const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
+const fs = require('fs');
 
 
 let gitDirArr = __dirname.split('\\')
 gitDirArr.pop()
-let gitDir = gitDirArr.join('/')
+let gitDir = gitDirArr.join('\\')
 gralUtils.logInfo('Git pull from ' + gitDir)
 let git = simpleGit(gitDir);
 git.pull((err, update) => {
     if(update && update.summary.changes) {
         setTimeout(() => {
             const time = new Date();
-            const filename = "restart.do"
+            const filename = __dirname + "\restart.do"
   
             try {
               fs.utimesSync(filename, time, time);
