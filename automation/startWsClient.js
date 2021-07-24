@@ -1,10 +1,11 @@
 const wsClient = require('./wsClient');
 const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
-const props = require('./props')
 
 
-let git = simpleGit(props.schedules.git_prop_folder);
+const gitDir = __dirname.split('/').pop().join('/')
+gralUtils.logInfo('Git pull from ' + gitDir)
+let git = simpleGit(gitDir);
 git.pull((err, update) => {
     if(update && update.summary.changes) {
         setTimeout(() => {
