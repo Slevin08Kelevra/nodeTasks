@@ -10,29 +10,29 @@ let gitDir = gitDirArr.join('\\')
 gralUtils.logInfo('Git pull to ' + gitDir)
 let git = simpleGit(gitDir);
 git.pull((err, update) => {
-    if(update && update.summary.changes) {
-        setTimeout(() => {
-            const time = new Date();
-            const filename = __dirname + "\\restart.do"
-  
-            try {
-              fs.utimesSync(filename, time, time);
-            } catch (err) {
-              fs.closeSync(fs.openSync(filename, 'w'));
-            }
-          }, 5000);
-          gralUtils.logInfo('Git pull changes, restarting in 10 secs')
+    if (update && update.summary.changes) {
+        const time = new Date();
+        const filename = __dirname + "\\restart.do"
+
+        try {
+            fs.utimesSync(filename, time, time);
+        } catch (err) {
+            fs.closeSync(fs.openSync(filename, 'w'));
+            gralUtils.logError('Cant modify restart.do')
+        }
+
+        gralUtils.logInfo('Git pull changes, restarting in 10 secs')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if')
     }
 
-    if (err){
+    if (err) {
         gralUtils.logError('Cant pull from git')
     }
-  })
+})
 
-gralUtils.getGitProps((localhost, remotehost, status)=>{
-    if (status == "wifi"){
+gralUtils.getGitProps((localhost, remotehost, status) => {
+    if (status == "wifi") {
         wsClient.start(localhost, status)
     } else {
         wsClient.start(remotehost, status)
