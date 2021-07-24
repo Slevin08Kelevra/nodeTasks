@@ -17,9 +17,9 @@ const checker = require("./schedules/chckWhereIsConn.js")
 
 if (process.env.COMPUTER_NAME != 'UBUNTU') {
     const simpleGit = require('simple-git');
-    let gitDirArr = __dirname.split('\\')
+    let gitDirArr = __dirname.split('/')
     gitDirArr.pop()
-    let gitDir = gitDirArr.join('\\')
+    let gitDir = gitDirArr.join('/')
     gralUtils.logInfo('Git pull to ' + gitDir)
     let git = simpleGit(gitDir);
     git.pull((err, update) => {
