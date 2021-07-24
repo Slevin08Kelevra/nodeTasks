@@ -12,6 +12,7 @@ var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
 
 const wsClient = []
 var stopping = false;
+var failedConnectionsTries = 0
 
 function noop() { }
 function heartbeat() {
@@ -39,6 +40,7 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('open', function () {
+    failedConnectionsTries = 0
     clearTimeout(this.pingTimeout);
     this.pingTimeout = setTimeout(() => {
       this.terminate();
@@ -62,6 +64,10 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('error', function (error) {
+    if (failedConnectionsTries > 15) {
+      restart()
+    }
+    failedConnectionsTries++
     gralUtils.logError("Socket client error: " + error.message)
   });
 
@@ -119,6 +125,19 @@ wsClient.start = (ip, st) => {
     gralUtils.logInfo("Exec action: " + action);
   });
 
+}
+
+function restart() {
+  setTimeout(() => {
+    const time = new Date();
+    const filename = "restart.do"
+
+    try {
+      fs.utimesSync(filename, time, time);
+    } catch (err) {
+      fs.closeSync(fs.openSync(filename, 'w'));
+    }
+  }, 3000);
 }
 
 wsClient.stop = () => {
