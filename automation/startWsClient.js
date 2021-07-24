@@ -2,7 +2,7 @@ const wsClient = require('./wsClient');
 const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
 
-console.log(__dirname)
+
 let gitDirArr = __dirname.split('\\')
 gitDirArr.pop()
 let gitDir = gitDirArr.join('/')
