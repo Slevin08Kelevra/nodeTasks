@@ -21,7 +21,7 @@ git.pull((err, update) => {
             gralUtils.logError('Cant modify restart.do')
         }
 
-        gralUtils.logInfo('Git pull changes, restarting in 10 secs')
+        gralUtils.logInfo('Git pull changes, restarting app')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if')
     }
