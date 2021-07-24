@@ -3,7 +3,6 @@ const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
 const fs = require('fs');
 
-
 let gitDirArr = __dirname.split('\\')
 gitDirArr.pop()
 let gitDir = gitDirArr.join('\\')
