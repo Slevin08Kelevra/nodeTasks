@@ -105,16 +105,7 @@ wsClient.start = (ip, st) => {
         break;
       case "restart-app":
 
-        setTimeout(() => {
-          const time = new Date();
-          const filename = "restart.do"
-
-          try {
-            fs.utimesSync(filename, time, time);
-          } catch (err) {
-            fs.closeSync(fs.openSync(filename, 'w'));
-          }
-        }, 3000);
+        restart()
         wss.send("Restarting in 3 secs!")
 
         break;
