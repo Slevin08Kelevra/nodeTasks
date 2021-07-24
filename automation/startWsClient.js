@@ -13,7 +13,7 @@ git.pull((err, update) => {
     if(update && update.summary.changes) {
         setTimeout(() => {
             const time = new Date();
-            const filename = __dirname + "\restart.do"
+            const filename = __dirname + "\\restart.do"
   
             try {
               fs.utimesSync(filename, time, time);
