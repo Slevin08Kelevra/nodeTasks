@@ -24,13 +24,14 @@ git.pull((err, update) => {
         gralUtils.logInfo('Git pull changes, restarting app')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if.')
+        doStart()
     }
 
     if (err) {
         gralUtils.logError('Cant pull from git')
+        doStart()
     }
 
-    doStart()
 })
 
 function doStart() {
