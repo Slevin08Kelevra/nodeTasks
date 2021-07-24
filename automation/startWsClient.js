@@ -29,12 +29,16 @@ git.pull((err, update) => {
     if (err) {
         gralUtils.logError('Cant pull from git')
     }
+
+    doStart()
 })
 
-gralUtils.getGitProps((localhost, remotehost, status) => {
-    if (status == "wifi") {
-        wsClient.start(localhost, status)
-    } else {
-        wsClient.start(remotehost, status)
-    }
-})
+function doStart() {
+    gralUtils.getGitProps((localhost, remotehost, status) => {
+        if (status == "wifi") {
+            wsClient.start(localhost, status)
+        } else {
+            wsClient.start(remotehost, status)
+        }
+    })
+}
