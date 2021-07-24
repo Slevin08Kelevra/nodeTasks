@@ -3,6 +3,7 @@ const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
 const fs = require('fs');
 
+
 let gitDirArr = __dirname.split('\\')
 gitDirArr.pop()
 let gitDir = gitDirArr.join('\\')
@@ -19,7 +20,7 @@ git.pull((err, update) => {
             } catch (err) {
               fs.closeSync(fs.openSync(filename, 'w'));
             }
-          }, 10000);
+          }, 30000);
           gralUtils.logInfo('Git pull changes, restarting in 10 secs')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if')
