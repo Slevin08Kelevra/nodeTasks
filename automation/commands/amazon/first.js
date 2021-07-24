@@ -11,11 +11,41 @@ const excludeAutomationFilter = (instance) => {
     return instance.group != undefined && instance.group != 'automation'
 }
 
+const onlyAutomationFilter = (instance) => {
+    return instance.group != undefined && instance.group === 'automation'
+}
+
 const amazon = {
 
     'test': async () => {
         console.log("arrived")
         return ["saranga"]
+    },
+    'ignite.centinel': async () => {
+        let data = await awsUtils.startAllInstances(onlyAutomationFilter)
+
+        let fixHosts = getFixHostsFuncNew()
+        let ids = data.map((inst) => {
+            return inst.id
+        })
+        awsUtils.waitFor(awsUtils.waitStatus['run'], ids, fixHosts)
+
+        let status = []
+        data.forEach((inst) => {
+            status.push(`${inst.id} -> ${inst.status}`)
+        })
+
+        return status
+    },
+    'stop.centinel': async () => {
+        let data = await awsUtils.shtudownAllInstances(onlyAutomationFilter)
+
+        let status = []
+        data.forEach((inst) => {
+            status.push(`${inst.id} -> ${inst.status}`)
+        })
+
+        return status
     },
     'ignite.servers': async () => {
         let data = await awsUtils.startAllInstances(excludeAutomationFilter)
@@ -83,6 +113,23 @@ const amazon = {
         return ["Fixing remote hosts"]
     }
 
+}
+
+function getFixHostsFuncNew(){
+    return async (instances) => {
+        console.log('Fixing hosts:')
+        await gralUtils.executeInLocal(props.aws.remove_my_local_hosts)
+        await gralUtils.executeInLocal(props.aws.add_my_host_title)
+        
+        for (const inst of instances) {
+            let host = inst.name.toLowerCase()
+            let ip = inst.pubIp
+            let i = 0, params = [ip, host]
+            let addHost = props.aws.add_new_host.replace(/%s/g, () => params[i++]);
+            await gralUtils.executeInLocal(addHost)
+            
+        }
+    }
 }
 
 function getFixHostsFunc() {

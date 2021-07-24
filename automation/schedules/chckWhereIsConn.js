@@ -61,8 +61,22 @@ function checkPhoneConnected() {
                     let ids = data.map((inst) => {
                         return inst.id
                     })
-                    awsUtils.waitFor(awsUtils.waitStatus['run'], ids, (instData) => {
+                    awsUtils.waitFor(awsUtils.waitStatus['run'], ids, async (instData) => {
                         gralUtils.logInfo("centinel started!")
+
+                        console.log('Fixing hosts:')
+                        await gralUtils.executeInLocal(props.aws.remove_my_local_hosts)
+                        await gralUtils.executeInLocal(props.aws.add_my_host_title)
+                        
+                        for (const inst of instData) {
+                            let host = inst.name.toLowerCase()
+                            let ip = inst.pubIp
+                            let i = 0, params = [ip, host]
+                            let addHost = props.aws.add_new_host.replace(/%s/g, () => params[i++]);
+                            await gralUtils.executeInLocal(addHost)
+                            
+                        }
+
                         let awsCentinelIp = instData.map((inst) => { return inst.pubIp }).find(ip => true)
                         awsCentinelIpOld = awsCentinelIp
                         setTimeout(() => {

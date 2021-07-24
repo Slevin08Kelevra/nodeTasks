@@ -170,6 +170,9 @@ awsUtils.waitFor = async (status, idList, callback) => {
                 let instance = {}
                 instance.id = res.Instances[0].InstanceId
                 instance.pubIp = res.Instances[0].PublicIpAddress
+                instance.name =  res.Instances[0].Tags.find(tag => {
+                    return tag.Key === "Name"
+                }).Value
                 return instance
             })
             callback(data)
