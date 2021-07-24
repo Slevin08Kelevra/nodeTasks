@@ -1,7 +1,7 @@
 const wsClient = require('./wsClient');
 const gralUtils = require('./gralUtils')
 const simpleGit = require('simple-git');
-const props = require('./../props')
+const props = require('./props')
 
 
 let git = simpleGit(props.schedules.git_prop_folder);
