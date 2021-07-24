@@ -4,7 +4,7 @@ const simpleGit = require('simple-git');
 
 
 let gitDirArr = __dirname.split('/')
-gitDir.pop()
+gitDirArr.pop()
 let gitDir = gitDirArr.join('/')
 gralUtils.logInfo('Git pull from ' + gitDir)
 let git = simpleGit(gitDir);
