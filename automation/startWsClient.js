@@ -20,7 +20,7 @@ git.pull((err, update) => {
             } catch (err) {
               fs.closeSync(fs.openSync(filename, 'w'));
             }
-          }, 30000);
+          }, 10000);
           gralUtils.logInfo('Git pull changes, restarting in 10 secs')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if')
