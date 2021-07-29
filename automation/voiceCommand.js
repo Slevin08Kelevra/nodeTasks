@@ -14,6 +14,30 @@ const gralUtils = require("./gralUtils");
 const { timeEnd } = require('console');
 const checker = require("./schedules/chckWhereIsConn.js")
 
+
+if (process.env.COMPUTER_NAME != 'UBUNTU') {
+    const simpleGit = require('simple-git');
+    let gitDirArr = __dirname.split('/')
+    gitDirArr.pop()
+    let gitDir = gitDirArr.join('/')
+    gralUtils.logInfo('Git pull to ' + gitDir)
+    let git = simpleGit(gitDir);
+    git.pull((err, update) => {
+        if (update && update.summary.changes) {
+            gralUtils.logInfo('Git pull changes found!')
+            gralUtils.logInfo(gralUtils.retartApp(10))
+
+        } else {
+            gralUtils.logInfo('Git with no changes, keep as if.')
+        }
+
+        if (err) {
+            gralUtils.logError('Cant pull from git')
+        }
+
+    })
+}
+
 var privateKey = fs.readFileSync(__dirname + '/certs/server.key', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/server.crt', 'utf8');
 var clientCert = [fs.readFileSync(__dirname + '/certs/client-ca-crt.pem', 'utf8')]
@@ -28,9 +52,9 @@ var server = https.createServer(options, app)
 const args = []
 const wsConns = new Map();
 checker.setWsConns(wsConns)
-function noop() {}
+function noop() { }
 function heartbeat() {
-  this.isAlive = true;
+    this.isAlive = true;
 }
 const wss = new WebSocket.Server({
     noServer: true,
@@ -38,7 +62,7 @@ const wss = new WebSocket.Server({
         try {
             let clientId = info.req.headers['client-id']
             let token = info.req.headers.authorization
-            if ( wsConns.get(clientId)){
+            if (wsConns.get(clientId)) {
                 gralUtils.logInfo(`${clientId} allready connected, so rejecting!`)
                 callback(false, 401, 'Unauthorized');
             }
@@ -64,21 +88,21 @@ server.on('upgrade', function upgrade(request, socket, head) {
 
 const respObserver = (timeout, errMessage) => {
     return {
-        res: null, 
+        res: null,
         redirect: (message) => {
-           res(message)
+            res(message)
         },
         expect: async () => {
-            let timeOutProm =  new Promise((resolve, reject) => {
-                setTimeout( () => { reject(errMessage); }, timeout);
+            let timeOutProm = new Promise((resolve, reject) => {
+                setTimeout(() => { reject(errMessage); }, timeout);
             })
             let messageProm = new Promise((resolve, reject) => {
                 res = resolve
             })
-            return Promise.race([ 
-                messageProm, 
-                timeOutProm, 
-              ])
+            return Promise.race([
+                messageProm,
+                timeOutProm,
+            ])
         }
     }
 }
@@ -87,17 +111,17 @@ wss.on('connection', function connection(ws, req) {
 
     ws.isAlive = true;
     ws.on('pong', heartbeat);
- 
+
     let clientId = req.headers['client-id']
     gralUtils.logInfo("ws connected " + clientId)
     let obs = respObserver(4000, "web socket time out")
-    wsConns.set(clientId, {ws, obs})
+    wsConns.set(clientId, { ws, obs })
 
     ws.on('message', function incoming(message) {
         gralUtils.logInfo("incomming ws msg: " + message)
-        if (message.startsWith('BI-INSTRUCTION:')){
+        if (message.startsWith('BI-INSTRUCTION:')) {
             if (!wsConns.get("BI_COMPUTER")) {
-                gralUtils.logInfo("BI_COMPUTER web client not connected!" )
+                gralUtils.logInfo("BI_COMPUTER web client not connected!")
             } else {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
                 ws.send(message.replace("BI-INSTRUCTION:", ""))
@@ -109,27 +133,27 @@ wss.on('connection', function connection(ws, req) {
     });
 
     ws.on('close', function close() {
-        gralUtils.logInfo(clientId +  ' ws closed')
+        gralUtils.logInfo(clientId + ' ws closed')
         wsConns.delete(clientId)
     });
 
-    ws.on('error', function(err) {
+    ws.on('error', function (err) {
         gralUtils.logError('ws error: ' + err);
     });
 });
 
 const interval = setInterval(function ping() {
     wss.clients.forEach(function each(ws) {
-      if (ws.isAlive === false) return ws.terminate();
-  
-      ws.isAlive = false;
-      ws.ping(noop);
-    });
-  }, 30000);
+        if (ws.isAlive === false) return ws.terminate();
 
-  wss.on('close', function close() {
+        ws.isAlive = false;
+        ws.ping(noop);
+    });
+}, 30000);
+
+wss.on('close', function close() {
     clearInterval(interval);
-  });
+});
 
 const toWords = new ToWords({
     localeCode: 'en-IN',
@@ -174,24 +198,24 @@ let postHanler = async (req) => {
 
     let cmdToRun = ['phrase.not.found']
     let index = 0
-    args.splice(0,args.length)
+    args.splice(0, args.length)
     Object.keys(phraseKeyMap).forEach(function (phrase) {
         fixedCmds.some(voiceCmd => {
-            if (phrase.includes('REGEX:')){
-               let phraseOk = phrase.replace(/\REGEX:/,'');
-               phraseOk = `^${phraseOk}$`
-               //console.log("-" + phraseOk + "-" + voiceCmd + "-")
-               let matched = voiceCmd.match(new RegExp(phraseOk))
-               if (matched){
-                let varNum = 0
-                while (matched.groups['arg'+varNum]){
-                   args.push(matched.groups['arg'+varNum])
-                   ++varNum
+            if (phrase.includes('REGEX:')) {
+                let phraseOk = phrase.replace(/\REGEX:/, '');
+                phraseOk = `^${phraseOk}$`
+                //console.log("-" + phraseOk + "-" + voiceCmd + "-")
+                let matched = voiceCmd.match(new RegExp(phraseOk))
+                if (matched) {
+                    let varNum = 0
+                    while (matched.groups['arg' + varNum]) {
+                        args.push(matched.groups['arg' + varNum])
+                        ++varNum
+                    }
+                    gralUtils.logInfo("Reg exp matched");
+                    cmdToRun[index++] = phraseKeyMap[phrase]
+                    return true
                 }
-                gralUtils.logInfo("Reg exp matched");
-                cmdToRun[index++] = phraseKeyMap[phrase]
-                return true
-               }
             } else {
                 var similarity = stringSimilarity.compareTwoStrings(phrase, voiceCmd);
                 if (similarity > 0.85) {
@@ -213,10 +237,10 @@ let postHanler = async (req) => {
 
     let response = {}
     if (execEnabled || cmdToRun[0] === "general.ping") {
-        if (cmdToRun[0] !== "general.ping"){
+        if (cmdToRun[0] !== "general.ping") {
             execEnabled = false
-        }  
-        response.status = await(commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns, allKeys, args)
+        }
+        response.status = await (commands[cmdToRun[0]] || commands['general.phrase.not.found'])(wsConns, allKeys, args)
         delayAndEnableExec()
         if (cmdToRun[0]) {
             response.appliedCmd = cmdToRun[0].replace(/\./g, ' ')
@@ -237,17 +261,17 @@ app.post('/send', async (req, res, next) => {
     response = await postHanler(req)
     gralUtils.logInfo(JSON.stringify(response))
     res.json(response)
-    
+
 })
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     gralUtils.logInfo('requested Route that not exist')
     res.status(404).send({
         status: 404,
         message: 'you have nothing to do here! you will be banned',
         type: 'just4idiots'
     })
- })
+})
 
 async function delayAndEnableExec() {
     setTimeout(function () {

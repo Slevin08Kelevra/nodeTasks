@@ -32,7 +32,7 @@ let common = {
     },
     'restart.application': async (wsConns, allKeys) => {
 
-        let result = gralUtils.retartApp()
+        let result = gralUtils.retartApp(3)
 
         return [result]
     }

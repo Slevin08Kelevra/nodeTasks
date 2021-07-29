@@ -112,11 +112,11 @@ function gitProps(action){
 
 gralUtils.wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-gralUtils.retartApp = () => {
+gralUtils.retartApp = (seconds) => {
     setTimeout(() =>{
         process.exit(0);   
-    }, 3000);
-    return "restarting in 3 secs!"
+    }, seconds * 1000);
+    return `restarting in ${seconds} secs!`
 }
 
 module.exports = gralUtils
