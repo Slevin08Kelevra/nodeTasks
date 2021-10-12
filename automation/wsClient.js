@@ -6,7 +6,7 @@ const ks = require('node-key-sender');
 const SerialPort = require('serialport')
 const { exec } = require('child_process');
 const gralUtils = require('./gralUtils');
-const shell = require('shelljs');
+const shell2 = require('shelljs');
 
 var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
@@ -111,7 +111,7 @@ wsClient.start = (ip, st) => {
 
         break;
       case "bkupworks":
-        wss.send(shell.exec('node backWritings.js').toString())
+        wss.send(shell2.exec('node backWritings.js').toString())
         break;
       default:
         text = "Action not recognized!";
