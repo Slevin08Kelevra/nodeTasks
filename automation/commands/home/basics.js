@@ -47,7 +47,7 @@ let home = {
         } else {
             message = await execute(wsConns, 'bkupworks')
         }
-        return [message]
+        return message
     }
 }
 
