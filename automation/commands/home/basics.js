@@ -40,10 +40,12 @@ let home = {
         let message = await udpt.sendWithRetry("SWITCH_STATUS")
         return [message]
     },
-    'backup my work': async () =>{
+    'backup my work': async (wsConns) =>{
         let message = 'Not ubuntu!'
         if (process.env.COMPUTER_NAME === 'UBUNTU'){
             message = shell.exec('node backWritings.js').toString()
+        } else {
+            message = await execute(wsConns, 'bkupworks')
         }
         return [message]
     }

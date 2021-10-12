@@ -5,7 +5,8 @@ const shell = require('node-powershell');
 const ks = require('node-key-sender');
 const SerialPort = require('serialport')
 const { exec } = require('child_process');
-const gralUtils = require('./gralUtils')
+const gralUtils = require('./gralUtils');
+const shell = require('shelljs');
 
 var privateKey = fs.readFileSync(__dirname + '/certs/client-key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/certs/client-crt.pem', 'utf8');
@@ -108,6 +109,9 @@ wsClient.start = (ip, st) => {
         restart()
         wss.send("Restarting in 3 secs!")
 
+        break;
+      case "bkupworks":
+        wss.send(shell.exec('node backWritings.js').toString())
         break;
       default:
         text = "Action not recognized!";
