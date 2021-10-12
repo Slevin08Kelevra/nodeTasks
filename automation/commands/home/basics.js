@@ -43,7 +43,7 @@ let home = {
     'backup.my.work': async (wsConns) =>{
         let message = 'Not ubuntu!'
         if (process.env.COMPUTER_NAME === 'UBUNTU'){
-            message = shell.exec('node backWritings.js').toString()
+            message = shell.exec('node backWritings.js').toString().trim()
         } else {
             message = await execute(wsConns, 'bkupworks')
         }

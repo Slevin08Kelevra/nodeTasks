@@ -111,7 +111,7 @@ wsClient.start = (ip, st) => {
 
         break;
       case "bkupworks":
-        wss.send(shell2.exec('node backWritings.js').toString())
+        wss.send(shell2.exec('node backWritings.js').toString().trim())
         break;
       default:
         text = "Action not recognized!";
