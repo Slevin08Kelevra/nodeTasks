@@ -1,3 +1,4 @@
+const shell = require('shelljs');
 const udpTransceiver = require('./../../udpTransceiver')
 const udpt = udpTransceiver(8284, 8285, 8286)
 
@@ -37,6 +38,13 @@ let home = {
     },
     'switch.status': async (wsConns, allKeys, args)=>{
         let message = await udpt.sendWithRetry("SWITCH_STATUS")
+        return [message]
+    },
+    'backup my work': async () =>{
+        let message = 'Not ubuntu!'
+        if (process.env.COMPUTER_NAME === 'UBUNTU'){
+            message = shell.exec('node backWritings.js').toString()
+        }
         return [message]
     }
 }
