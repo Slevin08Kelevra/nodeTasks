@@ -1,6 +1,7 @@
 const shell = require('shelljs');
 const udpTransceiver = require('./../../udpTransceiver')
 const udpt = udpTransceiver(8284, 8285, 8286)
+const gralUtils = require('./../../gralUtils');
 
 let home = {
 
@@ -41,9 +42,9 @@ let home = {
         return [message]
     },
     'backup.my.work': async (wsConns) =>{
-        let message = 'Not ubuntu!'
+        let message = ['Not ubuntu!']
         if (process.env.COMPUTER_NAME === 'UBUNTU'){
-            message = shell.exec('node backWritings.js').toString().trim()
+            message = [shell.exec('node backWritings.js').toString().trim()]
         } else {
             message = await execute(wsConns, 'bkupworks')
         }
@@ -58,7 +59,9 @@ async function execute(wsConns, doWhat) {
         ret = ['web socket not connected!']
     } else {
         let { ws, obs } = wsConns.get("UBUNTU")
-        ws.send(doWhat)
+        let comProt = gralUtils.getComProt()
+        comProt.data = doWhat
+        ws.send(comProt)
         let message = ""
         try {
             message = await obs.expect()

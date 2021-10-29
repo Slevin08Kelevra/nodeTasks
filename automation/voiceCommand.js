@@ -117,14 +117,17 @@ wss.on('connection', function connection(ws, req) {
     let obs = respObserver(4000, "web socket time out")
     wsConns.set(clientId, { ws, obs })
 
-    ws.on('message', function incoming(message) {
+    ws.on('message', function incoming(msg) {
+        let message = msg.data
         gralUtils.logInfo("incomming ws msg: " + message)
         if (message.startsWith('BI-INSTRUCTION:')) {
             if (!wsConns.get("BI_COMPUTER")) {
                 gralUtils.logInfo("BI_COMPUTER web client not connected!")
             } else {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
-                ws.send(message.replace("BI-INSTRUCTION:", ""))
+                let comProt = gralUtils.getComProt();
+                comProt.data = message.replace("BI-INSTRUCTION:", "")
+                ws.send(comProt)
                 gralUtils.logInfo('Instruction to BI sent!')
             }
         } else {

@@ -8,4 +8,5 @@ automation/reqValidator.js
 automation/reqValidatorAux.js
 automation/genSecData.js
 automation/backSensibleFiles.js
+automation/backWritings.js
 automation/Automation.postman_collection.json

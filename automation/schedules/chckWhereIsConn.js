@@ -134,7 +134,9 @@ function writeFileFromTemplate(status, wifi, pepe) {
             
             if (wsConns.get("BI_COMPUTER") && status === "pepe") {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
-                ws.send("ws-restart")
+                let comProt = gralUtils.getComProt()
+                comProt.data = "ws-restart"
+                ws.send(comProt)
                 let message = ""
                 try {
                     message = await obs.expect()

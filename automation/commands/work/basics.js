@@ -1,3 +1,7 @@
+
+const gralUtils = require('./../../gralUtils');
+
+
 let basics = {
 
     'print.my.information': async (wsConns) => {
@@ -38,7 +42,9 @@ async function execute(wsConns, doWhat) {
         ret = ['web socket not connected!']
     } else {
         let { ws, obs } = wsConns.get("BI_COMPUTER")
-        ws.send(doWhat)
+        let comProt = gralUtils.getComProt()
+        comProt.data = doWhat
+        ws.send(comProt)
         let message = ""
         try {
             message = await obs.expect()
