@@ -83,7 +83,7 @@ wsClient.start = (ip, st) => {
       }, 10000);
     }
 
-    let comProt = gralUtils.getComProt;
+    let comProt = gralUtils.getComProt();
 
     switch (action) {
       case "showMyInf":
@@ -152,7 +152,7 @@ wsClient.stop = () => {
 
 wsClient.send = (message) => {
   if (wss) {
-    let comProt = gralUtils.getComProt;
+    let comProt = gralUtils.getComProt();
     comProt.data = message
     wss.send(comProt.prepare())
   }
@@ -169,7 +169,7 @@ function unlock() {
       gralUtils.logError(err);
       return;
     }
-    let comProt = gralUtils.getComProt;
+    let comProt = gralUtils.getComProt();
     comProt.data = stdout
     wss.send(comProt.prepare())
   });
@@ -200,7 +200,7 @@ function showMyInf2() {
       gralUtils.logError(err)
       return
     }
-    let comProt = gralUtils.getComProt
+    let comProt = gralUtils.getComProt()
     comProt.data = data
     wss.send(comProt.prepare())
   })

@@ -42,7 +42,7 @@ async function execute(wsConns, doWhat) {
         ret = ['web socket not connected!']
     } else {
         let { ws, obs } = wsConns.get("BI_COMPUTER")
-        let comProt = gralUtils.getComProt
+        let comProt = gralUtils.getComProt()
         comProt.data = doWhat
         ws.send(comProt.prepare())
         let message = ""

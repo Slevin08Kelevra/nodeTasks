@@ -22,13 +22,19 @@ var connection_options = {
     privateKey: fs.readFileSync(process.env.AWS_KEY_PATH)
 };
 
-gralUtils.getComProt =  {
-    data: "",
-    prepare: () => { 
-        let communicationProtocol = {data: data}
-        return JSON.stringify(communicationProtocol)
-     }
+let communicationProtocol
+
+gralUtils.getComProt = () => {
+
+    communicationProtocol = {
+        data: '',
+        prepare: () => { 
+            let prepared = {data: communicationProtocol.data}
+            return JSON.stringify(prepared)
+         }
+    }
     
+    return communicationProtocol
 }
 
 gralUtils.executeInRemote = async (hosts, cmds) => {

@@ -125,7 +125,7 @@ wss.on('connection', function connection(ws, req) {
                 gralUtils.logInfo("BI_COMPUTER web client not connected!")
             } else {
                 let { ws, obs } = wsConns.get("BI_COMPUTER")
-                let comProt = gralUtils.getComProt;
+                let comProt = gralUtils.getComProt();
                 comProt.data = message.replace("BI-INSTRUCTION:", "")
                 ws.send(comProt.prepare())
                 gralUtils.logInfo('Instruction to BI sent!')
