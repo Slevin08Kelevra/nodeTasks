@@ -58,6 +58,7 @@ function heartbeat() {
 }
 const wss = new WebSocket.Server({
     noServer: true,
+    maxPayload: 450,
     verifyClient: async (info, callback) => {
         try {
             let clientId = info.req.headers['client-id']
