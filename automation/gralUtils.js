@@ -10,6 +10,7 @@ const nets = networkInterfaces();
 const cheerio = require('cheerio');
 const request = require('request');
 const shell = require('node-powershell');
+const { data } = require('cheerio/lib/api/attributes');
 
 const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
@@ -21,9 +22,13 @@ var connection_options = {
     privateKey: fs.readFileSync(process.env.AWS_KEY_PATH)
 };
 
-gralUtils.getComProt = () => {
-    let communicationProtocol = { data: "" }
-    return communicationProtocol
+gralUtils.getComProt =  {
+    data: "",
+    prepare: () => { 
+        let communicationProtocol = {data: data}
+        return JSON.stringify(communicationProtocol)
+     }
+    
 }
 
 gralUtils.executeInRemote = async (hosts, cmds) => {

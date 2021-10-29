@@ -73,7 +73,7 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('message', function incoming(message) {
-    let action = message.data
+    let action = JSON.parse(message).data
     if (action.startsWith('connect2home:')) {
       let ipAndstatus = action.replace("connect2home:", "").split(':')
       gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
@@ -83,7 +83,7 @@ wsClient.start = (ip, st) => {
       }, 10000);
     }
 
-    let comProt = gralUtils.getComProt();
+    let comProt = gralUtils.getComProt;
 
     switch (action) {
       case "showMyInf":
@@ -99,26 +99,26 @@ wsClient.start = (ip, st) => {
         wsClient.stop()
         evalueteStatuses()
         comProt.data = "BI comp ws restarting in 60 seconds!"
-        wss.send(comProt)
+        wss.send(comProt.prepare())
         break;
       case "ruok":
         comProt.data = "Ubuntu is fine, Sir!(vc-vib:2)"
-        wss.send(comProt)
+        wss.send(comProt.prepare())
         break;
       case "rualive":
         comProt.data ="Bi comp is fine, Sir!(vc-vib:2)"
-        wss.send(comProt)
+        wss.send(comProt.prepare())
         break;
       case "restart-app":
 
         restart()
         comProt.data = "Restarting in 3 secs!"
-        wss.send(comProt)
+        wss.send(comProt.prepare())
 
         break;
       case "bkupworks":
         comProt.data = shell2.exec('node backWritings.js').toString().trim()
-        wss.send(comProt)
+        wss.send(comProt.prepare())
         break;
       default:
         text = "Action not recognized!";
@@ -152,9 +152,9 @@ wsClient.stop = () => {
 
 wsClient.send = (message) => {
   if (wss) {
-    let comProt = gralUtils.getComProt();
+    let comProt = gralUtils.getComProt;
     comProt.data = message
-    wss.send(comProt)
+    wss.send(comProt.prepare())
   }
 }
 
@@ -169,9 +169,9 @@ function unlock() {
       gralUtils.logError(err);
       return;
     }
-    let comProt = gralUtils.getComProt();
+    let comProt = gralUtils.getComProt;
     comProt.data = stdout
-    wss.send(comProt)
+    wss.send(comProt.prepare())
   });
 }
 
@@ -184,9 +184,9 @@ function showMyInf() {
   ps.addCommand('Get-Content C:\\Users\\paparini\\Documents\\myinfo.txt | Set-Clipboard')
   ps.invoke().then(output => {
     ks.sendCombination(['control', 'v']);
-    let comProt = gralUtils.getComProt();
+    let comProt = gralUtils.getComProt;
     comProt.data = "key sent!!!"
-    wss.send(comProt)
+    wss.send(comProt.prepare())
   }).catch(err => {
     gralUtils.logError(err);
     ps.dispose();
@@ -200,9 +200,9 @@ function showMyInf2() {
       gralUtils.logError(err)
       return
     }
-    let comProt = gralUtils.getComProt();
+    let comProt = gralUtils.getComProt
     comProt.data = data
-    wss.send(comProt)
+    wss.send(comProt.prepare())
   })
 }
 

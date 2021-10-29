@@ -59,9 +59,9 @@ async function execute(wsConns, doWhat) {
         ret = ['web socket not connected!']
     } else {
         let { ws, obs } = wsConns.get("UBUNTU")
-        let comProt = gralUtils.getComProt()
+        let comProt = gralUtils.getComProt
         comProt.data = doWhat
-        ws.send(comProt)
+        ws.send(comProt.prepare())
         let message = ""
         try {
             message = await obs.expect()
