@@ -28,17 +28,26 @@ gralUtils.getComProt = () => {
 
     communicationProtocol = {
         data: '',
-        prepare: () => { 
-            let prepared = {data: communicationProtocol.data}
+        prepare: () => {
+            let prepared = { data: communicationProtocol.data }
             return JSON.stringify(prepared)
-         }
+        }
     }
-    
+
     return communicationProtocol
 }
 
 gralUtils.comProtExtract = (incommingMessage) => {
     return JSON.parse(incommingMessage)
+}
+
+gralUtils.protocolCheck = (incommingMessage) => {
+    try {
+        let parsed = JSON.parse(incommingMessage);
+        return parsed.hasOwnProperty('data');
+    } catch (e) {
+        return false;
+    }
 }
 
 gralUtils.executeInRemote = async (hosts, cmds) => {

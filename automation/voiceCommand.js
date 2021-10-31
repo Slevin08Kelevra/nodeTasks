@@ -13,6 +13,8 @@ const validator = require("./reqValidator");
 const gralUtils = require("./gralUtils");
 const { timeEnd } = require('console');
 const checker = require("./schedules/chckWhereIsConn.js")
+const rateLimit = require('ws-rate-limit')
+var limiter = rateLimit('10s', 20)
 
 
 if (process.env.COMPUTER_NAME != 'UBUNTU') {
@@ -110,6 +112,8 @@ const respObserver = (timeout, errMessage) => {
 
 wss.on('connection', function connection(ws, req) {
 
+    limiter(ws)
+
     ws.isAlive = true;
     ws.on('pong', heartbeat);
 
@@ -119,22 +123,33 @@ wss.on('connection', function connection(ws, req) {
     wsConns.set(clientId, { ws, obs })
 
     ws.on('message', function incoming(msg) {
-        let message = gralUtils.comProtExtract(msg).data
-        gralUtils.logInfo("incomming ws msg: " + message)
-        if (message.startsWith('BI-INSTRUCTION:')) {
-            if (!wsConns.get("BI_COMPUTER")) {
-                gralUtils.logInfo("BI_COMPUTER web client not connected!")
+        if (gralUtils.protocolCheck(msg)){
+            let message = gralUtils.comProtExtract(msg).data
+            gralUtils.logInfo("incomming ws msg: " + message)
+            if (message.startsWith('BI-INSTRUCTION:')) {
+                if (!wsConns.get("BI_COMPUTER")) {
+                    gralUtils.logInfo("BI_COMPUTER web client not connected!")
+                } else {
+                    let { ws, obs } = wsConns.get("BI_COMPUTER")
+                    let comProt = gralUtils.getComProt();
+                    comProt.data = message.replace("BI-INSTRUCTION:", "")
+                    ws.send(comProt.prepare())
+                    gralUtils.logInfo('Instruction to BI sent!')
+                }
             } else {
-                let { ws, obs } = wsConns.get("BI_COMPUTER")
-                let comProt = gralUtils.getComProt();
-                comProt.data = message.replace("BI-INSTRUCTION:", "")
-                ws.send(comProt.prepare())
-                gralUtils.logInfo('Instruction to BI sent!')
+                obs.redirect(message)
             }
         } else {
-            obs.redirect(message)
+            gralUtils.logInfo('Wrong communication protocols structure!')
+            ws.send('You are and intruder, authorities has been adviced!')
         }
     });
+
+    ws.on('limited', msg => {
+        gralUtils.logInfo('Rate limit activated!')
+        console.log(JSON.stringify(req.headers))
+        ws.send('I got your information.');
+    })
 
     ws.on('close', function close() {
         gralUtils.logInfo(clientId + ' ws closed')

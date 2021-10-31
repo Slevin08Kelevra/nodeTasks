@@ -73,6 +73,10 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('message', function incoming(message) {
+    if (!gralUtils.protocolCheck(message)){
+      gralUtils.logInfo('Wrong communication protocols structure!')
+        return;
+    }
     let action = gralUtils.comProtExtract(message).data
     if (action.startsWith('connect2home:')) {
       let ipAndstatus = action.replace("connect2home:", "").split(':')
