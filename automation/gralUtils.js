@@ -30,7 +30,11 @@ gralUtils.getComProt = () => {
     communicationProtocol = {
         data: '',
         prepare: () => {
-            let prepared = { data: communicationProtocol.data }
+            let tk = validator.generateShortToken()
+            let prepared = { 
+                token: tk,
+                data: communicationProtocol.data 
+            }
             return validator.blurMessage(JSON.stringify(prepared))
         }
     }
@@ -47,7 +51,11 @@ gralUtils.protocolCheck = (incommingMessage) => {
     try {
         incommingMessage = validator.unBlurMessage(incommingMessage)
         let parsed = JSON.parse(incommingMessage);
-        return parsed.hasOwnProperty('data');
+        if (validator.shortTokenIsValid(parsed.token)){
+            gralUtils.logInfo('Token not valid!!')
+            throw new Error('Token not valid!')
+        }
+        return parsed.hasOwnProperty('data')
     } catch (e) {
         gralUtils.logError(e)
         return false;
