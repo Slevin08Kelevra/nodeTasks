@@ -1,5 +1,5 @@
 [mongo]
-bin.path = C:\\Program Files\\MongoDB\\Server\\4.2\\bin
+bin.path = C:\\Program Files\\MongoDB\\Server\\4.4\\bin
 dump.parameters = --archive=%s --host localhost:%s -d edpp-db -u %s -p %s
 backup.path = C:\\mongoBackUp\\edpp-db-rotate-%s
 local.backup.path = C:\\mongoBackUp\\edpp-local-db-rotate-%s
