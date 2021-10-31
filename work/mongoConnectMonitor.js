@@ -24,7 +24,7 @@ const Stream = require('stream')
 const TokenGenerator = require('uuid-token-generator');
 const tokgen = new TokenGenerator();
 const log = require('node-log-rotate');
-const validator = require('./../reqValidator');
+const validator = require('./../automation/reqValidator');
 
 log.setup({
   appName: 'mongoConnectMonitor',
