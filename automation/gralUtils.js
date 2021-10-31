@@ -49,6 +49,7 @@ gralUtils.protocolCheck = (incommingMessage) => {
         let parsed = JSON.parse(incommingMessage);
         return parsed.hasOwnProperty('data');
     } catch (e) {
+        gralUtils.logError(e)
         return false;
     }
 }
