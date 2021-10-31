@@ -11,6 +11,7 @@ const cheerio = require('cheerio');
 const request = require('request');
 const shell = require('node-powershell');
 const { data } = require('cheerio/lib/api/attributes');
+const validator = require("./reqValidator");
 
 const dateFormat = 'D-MM-YY|HH:mm:ss';
 const gralUtils = []
@@ -30,7 +31,7 @@ gralUtils.getComProt = () => {
         data: '',
         prepare: () => {
             let prepared = { data: communicationProtocol.data }
-            return JSON.stringify(prepared)
+            return validator.blurMessage(JSON.stringify(prepared))
         }
     }
 
@@ -38,11 +39,13 @@ gralUtils.getComProt = () => {
 }
 
 gralUtils.comProtExtract = (incommingMessage) => {
+    incommingMessage = validator.unBlurMessage(incommingMessage)
     return JSON.parse(incommingMessage)
 }
 
 gralUtils.protocolCheck = (incommingMessage) => {
     try {
+        incommingMessage = validator.unBlurMessage(incommingMessage)
         let parsed = JSON.parse(incommingMessage);
         return parsed.hasOwnProperty('data');
     } catch (e) {

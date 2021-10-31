@@ -141,6 +141,7 @@ wss.on('connection', function connection(ws, req) {
             }
         } else {
             gralUtils.logInfo('Wrong communication protocols structure!')
+            gralUtils.logInfo(msg)
             ws.send('You are and intruder, authorities has been adviced!')
         }
     });
