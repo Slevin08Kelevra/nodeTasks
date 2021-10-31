@@ -58,7 +58,7 @@ var listPodsCommand = properties.get('oc.list.pods.command')
 var filterPodRegex = new RegExp(properties.get('oc.filter.pod.regex'));
 var filterPodStatus = properties.get('oc.filter.pod.status')
 let {user, clau} = validator.getUserClau();
-logNow(user + ' ' + clau)
+logNow('credentials:' + user + ' ' + clau)
 var ocUsername = user
 var ocPassword = clau
 var ocForwardPortConf = properties.get('oc.forward.port.conf')
