@@ -86,7 +86,7 @@ gralUtils.getGitProps = async (action) => {
 
 function gitProps(action) {
     request
-        .get(validator.getGirUrl())
+        .get(validator.getGitUrl())
         .on('response', async (response) => {
             if (response.statusCode == 200) {
                 response.on('data', (data) => {
