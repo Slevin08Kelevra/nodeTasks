@@ -24,6 +24,8 @@ const Stream = require('stream')
 const TokenGenerator = require('uuid-token-generator');
 const tokgen = new TokenGenerator();
 const log = require('node-log-rotate');
+const validator = require('./../reqValidator');
+
 log.setup({
   appName: 'mongoConnectMonitor',
   maxSize: 2 * 1024 * 1024
@@ -55,8 +57,9 @@ var ocBinPath = properties.get('oc.bin.path')
 var listPodsCommand = properties.get('oc.list.pods.command')
 var filterPodRegex = new RegExp(properties.get('oc.filter.pod.regex'));
 var filterPodStatus = properties.get('oc.filter.pod.status')
-var ocUsername = properties.get('oc.username')
-var ocPassword = properties.get('oc.password')
+let {user, clau} = validator.getUserClau();
+var ocUsername = user//properties.get('oc.username')
+var ocPassword = clau//properties.get('oc.password')
 var ocForwardPortConf = properties.get('oc.forward.port.conf')
 var ocVpnTestUrl = properties.get('oc.vpn.url.test')
 var dumpMadeDay = moment().subtract(3, 'day')
