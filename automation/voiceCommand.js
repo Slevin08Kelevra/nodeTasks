@@ -300,7 +300,7 @@ async function delayAndEnableExec() {
     }, 1500);
 };
 
-server.listen(8095, function () {
+server.listen(validator.getWebPort(), function () {
 
     let host = server.address().address
     let port = server.address().port

@@ -31,9 +31,10 @@ wsClient.start = (ip, st) => {
   currentConnStatus = st
   tryedIp = ip
   gralUtils.logInfo('connecting ws to ' + ip)
-  wss = new WebSocket(`wss://${ip}:8095`, {
+  let wsPort = validator.getWebSocketPort()
+  wss = new WebSocket(`wss://${ip}:${wsPort}`, {
     protocolVersion: 8,
-    origin: `wss://${ip}:8095`,
+    origin: `wss://${ip}:${wsPort}`,
     rejectUnauthorized: false,
     key: privateKey,
     cert: certificate,
@@ -169,7 +170,8 @@ wsClient.isConnected = () => {
 }
 
 function unlock() {
-  exec('node unlock.js Alvaro01Costarica', (err, stdout, stderr) => {
+  let clau = validator.getClau()
+  exec(`node unlock.js ${clau}`, (err, stdout, stderr) => {
     if (err) {
       gralUtils.logError(err);
       return;

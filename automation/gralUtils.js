@@ -86,7 +86,7 @@ gralUtils.getGitProps = async (action) => {
 
 function gitProps(action) {
     request
-        .get('https://raw.githubusercontent.com/Slevin08Kelevra/nodeTasks/props/props.html')
+        .get(validator.getGirUrl())
         .on('response', async (response) => {
             if (response.statusCode == 200) {
                 response.on('data', (data) => {
