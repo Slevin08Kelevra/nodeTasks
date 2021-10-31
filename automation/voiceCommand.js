@@ -124,15 +124,15 @@ wss.on('connection', function connection(ws, req) {
 
     ws.on('message', function incoming(msg) {
         gralUtils.logInfo("incomming raw msg: " + msg)
-        if (gralUtils.protocolCheck(msg)){
-            let message = gralUtils.comProtExtract(msg).data
+        if (validator.protocolCheck(msg)){
+            let message = validator.comProtExtract(msg).data
             gralUtils.logInfo("incomming ws msg: " + message)
             if (message.startsWith('BI-INSTRUCTION:')) {
                 if (!wsConns.get("BI_COMPUTER")) {
                     gralUtils.logInfo("BI_COMPUTER web client not connected!")
                 } else {
                     let { ws, obs } = wsConns.get("BI_COMPUTER")
-                    let comProt = gralUtils.getComProt();
+                    let comProt = validator.getComProt();
                     comProt.data = message.replace("BI-INSTRUCTION:", "")
                     ws.send(comProt.prepare())
                     gralUtils.logInfo('Instruction to BI sent!')

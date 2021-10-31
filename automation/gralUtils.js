@@ -23,46 +23,6 @@ var connection_options = {
     privateKey: fs.readFileSync(process.env.AWS_KEY_PATH)
 };
 
-let communicationProtocol
-
-gralUtils.getComProt = () => {
-
-    communicationProtocol = {
-        data: '',
-        prepare: () => {
-            let tk = validator.generateShortToken()
-            let prepared = { 
-                token: tk,
-                data: communicationProtocol.data 
-            }
-            return validator.blurMessage(JSON.stringify(prepared))
-        }
-    }
-
-    return communicationProtocol
-}
-
-gralUtils.comProtExtract = (incommingMessage) => {
-    incommingMessage = validator.unBlurMessage(incommingMessage)
-    return JSON.parse(incommingMessage)
-}
-
-gralUtils.protocolCheck = (incommingMessage) => {
-    try {
-        incommingMessage = validator.unBlurMessage(incommingMessage)
-        let parsed = JSON.parse(incommingMessage);
-        if (!validator.shortTokenIsValid(parsed.token)){
-            gralUtils.logInfo('Token not valid!!')
-            throw new Error('Token not valid!')
-        }
-        return parsed.hasOwnProperty('data')
-    } catch (e) {
-        gralUtils.logInfo(e)
-        gralUtils.logInfo(incommingMessage)
-        return false;
-    }
-}
-
 gralUtils.executeInRemote = async (hosts, cmds) => {
     return new Promise((resolve, reject) => {
         rexec(hosts, cmds, connection_options, function (err) {

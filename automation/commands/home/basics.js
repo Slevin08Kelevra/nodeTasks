@@ -1,7 +1,7 @@
 const shell = require('shelljs');
 const udpTransceiver = require('./../../udpTransceiver')
 const udpt = udpTransceiver(8284, 8285, 8286)
-const gralUtils = require('./../../gralUtils');
+const validator = require('./../../reqValidator');
 
 let home = {
 
@@ -59,7 +59,7 @@ async function execute(wsConns, doWhat) {
         ret = ['web socket not connected!']
     } else {
         let { ws, obs } = wsConns.get("UBUNTU")
-        let comProt = gralUtils.getComProt()
+        let comProt = validator.getComProt()
         comProt.data = doWhat
         ws.send(comProt.prepare())
         let message = ""

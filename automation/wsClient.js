@@ -73,10 +73,10 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('message', function incoming(message) {
-    if (!gralUtils.protocolCheck(message)) {
+    if (!validator.protocolCheck(message)) {
       gralUtils.logInfo('Wrong communication protocols structure!')
     } else {
-      let action = gralUtils.comProtExtract(message).data
+      let action = validator.comProtExtract(message).data
       if (action.startsWith('connect2home:')) {
         let ipAndstatus = action.replace("connect2home:", "").split(':')
         gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
@@ -86,7 +86,7 @@ wsClient.start = (ip, st) => {
         }, 10000);
       }
 
-      let comProt = gralUtils.getComProt();
+      let comProt = validator.getComProt();
 
       switch (action) {
         case "showMyInf":
@@ -157,7 +157,7 @@ wsClient.stop = () => {
 
 wsClient.send = (message) => {
   if (wss) {
-    let comProt = gralUtils.getComProt();
+    let comProt = validator.getComProt();
     comProt.data = message
     wss.send(comProt.prepare())
   }
@@ -174,7 +174,7 @@ function unlock() {
       gralUtils.logError(err);
       return;
     }
-    let comProt = gralUtils.getComProt();
+    let comProt = validator.getComProt();
     comProt.data = stdout
     wss.send(comProt.prepare())
   });
@@ -189,7 +189,7 @@ function showMyInf() {
   ps.addCommand('Get-Content C:\\Users\\paparini\\Documents\\myinfo.txt | Set-Clipboard')
   ps.invoke().then(output => {
     ks.sendCombination(['control', 'v']);
-    let comProt = gralUtils.getComProt;
+    let comProt = validator.getComProt;
     comProt.data = "key sent!!!"
     wss.send(comProt.prepare())
   }).catch(err => {
@@ -205,7 +205,7 @@ function showMyInf2() {
       gralUtils.logError(err)
       return
     }
-    let comProt = gralUtils.getComProt()
+    let comProt = validator.getComProt()
     comProt.data = data
     wss.send(comProt.prepare())
   })
