@@ -73,62 +73,63 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('message', function incoming(message) {
-    if (!gralUtils.protocolCheck(message)){
+    if (!gralUtils.protocolCheck(message)) {
       gralUtils.logInfo('Wrong communication protocols structure!')
-        return;
-    }
-    let action = gralUtils.comProtExtract(message).data
-    if (action.startsWith('connect2home:')) {
-      let ipAndstatus = action.replace("connect2home:", "").split(':')
-      gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
-      wsClient.stop()
-      setTimeout(() => {
-        wsClient.start(ipAndstatus[0], ipAndstatus[1])
-      }, 10000);
-    }
-
-    let comProt = gralUtils.getComProt();
-
-    switch (action) {
-      case "showMyInf":
-        showMyInf()
-        break;
-      case "showMyInf2":
-        showMyInf2()
-        break;
-      case "unlock":
-        unlock()
-        break;
-      case "ws-restart":
+    } else {
+      let action = gralUtils.comProtExtract(message).data
+      if (action.startsWith('connect2home:')) {
+        let ipAndstatus = action.replace("connect2home:", "").split(':')
+        gralUtils.logInfo("Trying to desconnect ws from aws and connect home")
         wsClient.stop()
-        evalueteStatuses()
-        comProt.data = "BI comp ws restarting in 60 seconds!"
-        wss.send(comProt.prepare())
-        break;
-      case "ruok":
-        comProt.data = "Ubuntu is fine, Sir!(vc-vib:2)"
-        wss.send(comProt.prepare())
-        break;
-      case "rualive":
-        comProt.data ="Bi comp is fine, Sir!(vc-vib:2)"
-        wss.send(comProt.prepare())
-        break;
-      case "restart-app":
+        setTimeout(() => {
+          wsClient.start(ipAndstatus[0], ipAndstatus[1])
+        }, 10000);
+      }
 
-        restart()
-        comProt.data = "Restarting in 3 secs!"
-        wss.send(comProt.prepare())
+      let comProt = gralUtils.getComProt();
 
-        break;
-      case "bkupworks":
-        comProt.data = shell2.exec('node backWritings.js').toString().trim()
-        wss.send(comProt.prepare())
-        break;
-      default:
-        text = "Action not recognized!";
+      switch (action) {
+        case "showMyInf":
+          showMyInf()
+          break;
+        case "showMyInf2":
+          showMyInf2()
+          break;
+        case "unlock":
+          unlock()
+          break;
+        case "ws-restart":
+          wsClient.stop()
+          evalueteStatuses()
+          comProt.data = "BI comp ws restarting in 60 seconds!"
+          wss.send(comProt.prepare())
+          break;
+        case "ruok":
+          comProt.data = "Ubuntu is fine, Sir!(vc-vib:2)"
+          wss.send(comProt.prepare())
+          break;
+        case "rualive":
+          comProt.data = "Bi comp is fine, Sir!(vc-vib:2)"
+          wss.send(comProt.prepare())
+          break;
+        case "restart-app":
+
+          restart()
+          comProt.data = "Restarting in 3 secs!"
+          wss.send(comProt.prepare())
+
+          break;
+        case "bkupworks":
+          comProt.data = shell2.exec('node backWritings.js').toString().trim()
+          wss.send(comProt.prepare())
+          break;
+        default:
+          text = "Action not recognized!";
+      }
+
+      gralUtils.logInfo("Exec action: " + action);
     }
 
-    gralUtils.logInfo("Exec action: " + action);
   });
 
 }

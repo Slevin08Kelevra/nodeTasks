@@ -57,7 +57,8 @@ gralUtils.protocolCheck = (incommingMessage) => {
         }
         return parsed.hasOwnProperty('data')
     } catch (e) {
-        gralUtils.logError(e)
+        gralUtils.logInfo(e)
+        gralUtils.logInfo(incommingMessage)
         return false;
     }
 }
