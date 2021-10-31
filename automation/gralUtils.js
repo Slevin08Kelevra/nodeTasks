@@ -37,6 +37,10 @@ gralUtils.getComProt = () => {
     return communicationProtocol
 }
 
+gralUtils.comProtExtract = (incommingMessage) => {
+    return JSON.parse(incommingMessage)
+}
+
 gralUtils.executeInRemote = async (hosts, cmds) => {
     return new Promise((resolve, reject) => {
         rexec(hosts, cmds, connection_options, function (err) {

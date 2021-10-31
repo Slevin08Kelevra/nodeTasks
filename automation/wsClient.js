@@ -73,7 +73,7 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('message', function incoming(message) {
-    let action = JSON.parse(message).data
+    let action = gralUtils.comProtExtract(msg).data
     if (action.startsWith('connect2home:')) {
       let ipAndstatus = action.replace("connect2home:", "").split(':')
       gralUtils.logInfo("Trying to desconnect ws from aws and connect home")

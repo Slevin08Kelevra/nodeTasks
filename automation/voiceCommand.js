@@ -119,7 +119,7 @@ wss.on('connection', function connection(ws, req) {
     wsConns.set(clientId, { ws, obs })
 
     ws.on('message', function incoming(msg) {
-        let message = JSON.parse(msg).data
+        let message = gralUtils.comProtExtract(msg).data
         gralUtils.logInfo("incomming ws msg: " + message)
         if (message.startsWith('BI-INSTRUCTION:')) {
             if (!wsConns.get("BI_COMPUTER")) {
