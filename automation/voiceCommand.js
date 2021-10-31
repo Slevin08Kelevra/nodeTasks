@@ -123,6 +123,7 @@ wss.on('connection', function connection(ws, req) {
     wsConns.set(clientId, { ws, obs })
 
     ws.on('message', function incoming(msg) {
+        gralUtils.logInfo("incomming raw msg: " + msg)
         if (gralUtils.protocolCheck(msg)){
             let message = gralUtils.comProtExtract(msg).data
             gralUtils.logInfo("incomming ws msg: " + message)
