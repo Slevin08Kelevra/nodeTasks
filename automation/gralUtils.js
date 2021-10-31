@@ -51,7 +51,7 @@ gralUtils.protocolCheck = (incommingMessage) => {
     try {
         incommingMessage = validator.unBlurMessage(incommingMessage)
         let parsed = JSON.parse(incommingMessage);
-        if (validator.shortTokenIsValid(parsed.token)){
+        if (!validator.shortTokenIsValid(parsed.token)){
             gralUtils.logInfo('Token not valid!!')
             throw new Error('Token not valid!')
         }
