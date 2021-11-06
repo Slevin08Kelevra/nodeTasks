@@ -82,12 +82,13 @@ funcs.getChildExecutorWithReturn = (args) => {
         try {
             const { stdout, stderr } = await execAsync(args.cmd)
             if (stderr != "") {
-                throw "error"
+                console.log(stderr)
+                //throw "error"
             } else {
                 console.log(stdout.trim())
             }
         } catch (e) {
-            console.error(e.message.trim());
+            console.error(e);
             throw args.name + ' execution aborted'
         }
         console.log(args.name + ": OK")
