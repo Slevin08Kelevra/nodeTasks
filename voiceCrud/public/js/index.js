@@ -8,6 +8,8 @@ var startClock = FuzzySet(['iniciar cronometro']);
 var stopClock = FuzzySet(['detener cronometro']);
 var cleanClock = FuzzySet(['limpiar cronometro']);
 
+var letMeIn = FuzzySet(['dejame entrar']);
+
 /* app.config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
@@ -89,27 +91,29 @@ var settings = {
 
             } else if (sendRecogText) {
 
-                if (checkSimilarity(startClock.get(text))){
+                if (checkSimilarity(startClock.get(text))) {
                     fader('sp-rec-cont-success', 'on-off');
                     chronoStart();
                     artyom.say("iniciado");
                     console.log(text);
-                } else if (checkSimilarity(stopClock.get(text))){
+                } else if (checkSimilarity(stopClock.get(text))) {
                     fader('sp-rec-cont-success', 'on-off');
                     var speakTime = ""
-                    var segundx = (speakSecs > 1)?"segundos":"segundo"
-                    var minutx = (speakMins > 1)?"minutos":"minuto"
+                    var segundx = (speakSecs > 1) ? "segundos" : "segundo"
+                    var minutx = (speakMins > 1) ? "minutos" : "minuto"
                     if (speakMins > 0)
                         speakTime = speakMins + ` ${minutx} `
-                    speakTime+= speakSecs + ` ${segundx}`
+                    speakTime += speakSecs + ` ${segundx}`
                     chronoStop();
                     artyom.say(speakTime);
                     console.log(text);
-                } else if (checkSimilarity(cleanClock.get(text))){
+                } else if (checkSimilarity(cleanClock.get(text))) {
                     fader('sp-rec-cont-success', 'on-off');
                     chronoReset();
                     artyom.say("listo");
                     console.log(text);
+                } else if (checkSimilarity(letMeIn.get(text))) {
+                    sendPostToServer('letMeIn')
                 }
 
                 /* console.log("sending to java");
@@ -148,6 +152,28 @@ var settings = {
         }
     }
 };
+
+function sendPostToServer(text) {
+
+    console.log("sending to node server");
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+    xmlhttp.open("POST", "http://localhost:8096/api/doSomething");
+    xmlhttp.setRequestHeader("Content-Type", "application/json");
+    xmlhttp.onload = function () {
+        if (xmlhttp.readyState === xmlhttp.DONE) {
+            if (xmlhttp.status === 200) {
+                var resp = JSON.parse(xmlhttp.response);
+                if (resp.status == 'EXECUTED') {
+                    fader('sp-rec-cont-success', 'on-off');
+                    //console.log(resp.status);
+                }
+
+            }
+        }
+    };
+    xmlhttp.send(JSON.stringify({ do: text }));
+
+}
 
 
 var UserDictation = artyom.newDictation(settings);
@@ -329,57 +355,57 @@ var diff = 0
 var timerID = 0
 var speakMins;
 var speakSecs;
-function chrono(){
-	end = new Date()
-	diff = end - start
-	diff = new Date(diff)
-	var msec = diff.getMilliseconds()
-	var sec = diff.getSeconds()
-	var min = diff.getMinutes()
-	var hr = diff.getHours()-1
-	if (min < 10){
-		min = "0" + min
-	}
-	if (sec < 10){
-		sec = "0" + sec
-	}
-	if(msec < 10){
-		msec = "00" +msec
-	}
-	else if(msec < 100){
-		msec = "0" +msec
-	}
-	document.getElementById("chronotime").innerHTML = hr + ":" + min + ":" + sec + ":" + msec
+function chrono() {
+    end = new Date()
+    diff = end - start
+    diff = new Date(diff)
+    var msec = diff.getMilliseconds()
+    var sec = diff.getSeconds()
+    var min = diff.getMinutes()
+    var hr = diff.getHours() - 1
+    if (min < 10) {
+        min = "0" + min
+    }
+    if (sec < 10) {
+        sec = "0" + sec
+    }
+    if (msec < 10) {
+        msec = "00" + msec
+    }
+    else if (msec < 100) {
+        msec = "0" + msec
+    }
+    document.getElementById("chronotime").innerHTML = hr + ":" + min + ":" + sec + ":" + msec
     speakMins = +min
     speakSecs = +sec
-	timerID = setTimeout("chrono()", 10)
+    timerID = setTimeout("chrono()", 10)
 }
-function chronoStart(){
-	document.chronoForm.startstop.value = "stop!"
-	document.chronoForm.startstop.onclick = chronoStop
-	document.chronoForm.reset.onclick = chronoReset
-	start = new Date()
-	chrono()
+function chronoStart() {
+    document.chronoForm.startstop.value = "stop!"
+    document.chronoForm.startstop.onclick = chronoStop
+    document.chronoForm.reset.onclick = chronoReset
+    start = new Date()
+    chrono()
 }
-function chronoContinue(){
-	document.chronoForm.startstop.value = "stop!"
-	document.chronoForm.startstop.onclick = chronoStop
-	document.chronoForm.reset.onclick = chronoReset
-	start = new Date()-diff
-	start = new Date(start)
-	chrono()
+function chronoContinue() {
+    document.chronoForm.startstop.value = "stop!"
+    document.chronoForm.startstop.onclick = chronoStop
+    document.chronoForm.reset.onclick = chronoReset
+    start = new Date() - diff
+    start = new Date(start)
+    chrono()
 }
-function chronoReset(){
-	document.getElementById("chronotime").innerHTML = "0:00:00:000"
-	start = new Date()
+function chronoReset() {
+    document.getElementById("chronotime").innerHTML = "0:00:00:000"
+    start = new Date()
 }
-function chronoStopReset(){
-	document.getElementById("chronotime").innerHTML = "0:00:00:000"
-	document.chronoForm.startstop.onclick = chronoStart
+function chronoStopReset() {
+    document.getElementById("chronotime").innerHTML = "0:00:00:000"
+    document.chronoForm.startstop.onclick = chronoStart
 }
-function chronoStop(){
-	document.chronoForm.startstop.value = "start!"
-	document.chronoForm.startstop.onclick = chronoContinue
-	document.chronoForm.reset.onclick = chronoStopReset
-	clearTimeout(timerID)
+function chronoStop() {
+    document.chronoForm.startstop.value = "start!"
+    document.chronoForm.startstop.onclick = chronoContinue
+    document.chronoForm.reset.onclick = chronoStopReset
+    clearTimeout(timerID)
 }
