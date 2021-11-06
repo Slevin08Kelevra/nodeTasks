@@ -31,6 +31,23 @@ funcs.getMongoNodeCmdExecutor = (args) => {
     return new command(func)
 }
 
+funcs.getChangeProcDir = (args) => {
+    let func = async () => {
+        try {
+            process.chdir(args.path);
+            if (true) {
+                console.log(args.name + ": OK")
+                return
+            }
+        } catch (err) {
+            console.error(err)
+            throw args.name + ' execution aborted'
+        }
+        //throw args.name + ` execution aborted: ${args.path} does not exist`
+    }
+    return new command(func)
+}
+
 funcs.getFileChecker = (args) => {
     let func = async () => {
         try {
