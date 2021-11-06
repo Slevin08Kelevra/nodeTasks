@@ -108,6 +108,7 @@ var settings = {
                 } else if (checkSimilarity(cleanClock.get(text))){
                     fader('sp-rec-cont-success', 'on-off');
                     chronoReset();
+                    artyom.say("listo");
                     console.log(text);
                 }
 
