@@ -6,6 +6,7 @@ const gralUtils = require("./../gralUtils");
 const awsUtils = require("./../awsUtils");
 const props = require('./../props')
 const wsClient = require('./../wsClient')
+const validator = require("./../reqValidator");
 
 var wsConns
 
