@@ -1,8 +1,13 @@
 
 const gralUtils = require('./../../gralUtils.js')
+const validator = require('./../../reqValidator');
 
 let common = {
 
+    'create.certificates': async (wsConns, allKeys) => {
+        genCerts(wsConns)
+        return ['generatinig certificates']
+    },
     'phrase.not.found': async () => {
         return ['not found']
     },
@@ -45,5 +50,28 @@ const groupBy = (array, val) => {
     return array;
 };
 
+async function genCerts(wsConns){
+     gralUtils.logInfo('***** GENERATING CERTS *****')
+     await gralUtils.executeInLocalWithOut('node genSecCerts.js')
+     gralUtils.logInfo('***** CERTS GENERATED *****')
+     let ret = ['not waiting something is wrong']
+    if (!wsConns.get("BI_COMPUTER")) {
+        ret = ['web socket not connected!']
+    } else {
+        let { ws, obs } = wsConns.get("BI_COMPUTER")
+        let comProt = validator.getComProt()
+        comProt.data = 'extractCertificates'
+        ws.send(comProt.prepare())
+        let message = ""
+        try {
+            message = await obs.expect()
+        } catch (error) {
+            message = error
+        }
+
+        ret = [message]
+    }
+
+}
 
 module.exports = common;

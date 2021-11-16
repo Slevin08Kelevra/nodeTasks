@@ -46,6 +46,18 @@ gralUtils.executeInLocal = async (cmd) => {
     console.log(`Command: (${cmd}) -> OK`)
 }
 
+gralUtils.executeInLocalWithOut = async (cmd) => {
+    try {
+        const { stdout, stderr } = await execAsync(cmd)
+        console.log('stdout:', stdout);
+        console.log('stderr:', stderr);
+    } catch (e) {
+        console.error(e.message.trim());
+        throw new Error('Excecution problem')
+    }
+    console.log(`Command: (${cmd}) -> OK`)
+}
+
 gralUtils.logInfo = async (msg) => {
     let date = moment().format(dateFormat)
     console.log(date + " -> " + msg)
