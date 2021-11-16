@@ -90,6 +90,9 @@ wsClient.start = (ip, st) => {
       let comProt = validator.getComProt();
 
       switch (action) {
+        case "extractCertificates":
+          extractCertificates()
+          break;
         case "showMyInf":
           showMyInf()
           break;
@@ -174,6 +177,27 @@ function unlock() {
   exec(`node unlock.js ${clau}`, (err, stdout, stderr) => {
     if (err) {
       gralUtils.logError(err);
+      return;
+    }
+    let comProt = validator.getComProt();
+    comProt.data = stdout
+    wss.send(comProt.prepare())
+  });
+}
+
+function extractCertificates() {
+  gralUtils.logInfo('Extracting certs from ubuntu!')
+  exec(`node extractCerts.js`, (err, stdout, stderr) => {
+    if (err) {
+      gralUtils.logError(err);
+      return;
+    }
+    if (stdout) {
+      gralUtils.logInfo(stdout);
+      return;
+    }
+    if (stderr) {
+      gralUtils.logInfo(stderr);
       return;
     }
     let comProt = validator.getComProt();

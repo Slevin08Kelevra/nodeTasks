@@ -179,10 +179,6 @@ function sendPostToServer(text) {
 var UserDictation = artyom.newDictation(settings);
 var timeout;
 
-function stopAndstartRecog() {
-    UserDictation.stop();
-}
-
 function startRecognition() {
     keepRecogOn = true;
     UserDictation.start();
@@ -203,8 +199,8 @@ function toggleRecog() {
 function stopRecognition() {
     keepRecogOn = false;
     UserDictation.stop();
+    document.getElementById("sp-rec-cont-gear").style.display = 'none';
     document.getElementById("armed").style.display = 'none';
-    //document.getElementById("sp-rec-cont-gear").style.display = 'none';
 }
 
 function fader(element, state) {
