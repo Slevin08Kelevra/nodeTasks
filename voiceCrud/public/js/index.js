@@ -7,6 +7,7 @@ var stopCommand = FuzzySet(['detener reconocimiento']);
 var startClock = FuzzySet(['iniciar cronometro']);
 var stopClock = FuzzySet(['detener cronometro']);
 var cleanClock = FuzzySet(['limpiar cronometro']);
+var workWindows = FuzzySet(['abrir ventanas del trabajo']);
 
 var letMeIn = FuzzySet(['dejame entrar']);
 
@@ -114,6 +115,8 @@ var settings = {
                     console.log(text);
                 } else if (checkSimilarity(letMeIn.get(text))) {
                     sendPostToServer('letMeIn')
+                } else if (checkSimilarity(workWindows.get(text))) {
+                    sendPostToServer('workWindows')
                 }
 
                 /* console.log("sending to java");

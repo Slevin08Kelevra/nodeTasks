@@ -36,6 +36,9 @@ funcs.letMeIn = () => {
     }
   }); 
 }
+funcs.workWindows = () => {
+  console.log('openning work windows, executing')
+}
 
 
 
