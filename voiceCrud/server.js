@@ -38,6 +38,12 @@ funcs.letMeIn = () => {
 }
 funcs.workWindows = () => {
   console.log('openning work windows, executing')
+  exec(`start msedge --new-tab "https://confluence.biscrum.com/pages/viewpage.action?pageId=168453911"`, (err, stdout, stderr) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+  }); 
 }
 
 
