@@ -91,6 +91,9 @@ wsClient.start = (ip, st) => {
       let comProt = validator.getComProt();
 
       switch (action) {
+        case "placeCertificates":
+          console.log("*********** place certs on bi")
+          break;
         case "extractCertificates":
           extractCertificates()
           break;

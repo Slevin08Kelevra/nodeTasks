@@ -4,6 +4,11 @@ const validator = require('./../../reqValidator');
 
 let common = {
 
+    'place.certificates': async (wsConns, allKeys) => {
+        gralUtils.logInfo('***** PLACING CERTIFIATES *****')
+        placeCertificates(wsConns)
+        return ['placing certificates certificates']
+    },
     'create.certificates': async (wsConns, allKeys) => {
         genCerts(wsConns)
         return ['generatinig certificates']
@@ -71,6 +76,27 @@ async function genCerts(wsConns){
 
         ret = [message]
     }
+
+}
+
+async function placeCertificates(wsConns){
+    let ret = ['not waiting something is wrong']
+   if (!wsConns.get("BI_COMPUTER")) {
+       ret = ['web socket not connected!']
+   } else {
+       let { ws, obs } = wsConns.get("BI_COMPUTER")
+       let comProt = validator.getComProt()
+       comProt.data = 'placeCertificates'
+       ws.send(comProt.prepare())
+       let message = ""
+       try {
+           message = await obs.expect()
+       } catch (error) {
+           message = error
+       }
+
+       ret = [message]
+   }
 
 }
 
