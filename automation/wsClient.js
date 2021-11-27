@@ -66,7 +66,8 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('error', function (error) {
-    if (failedConnectionsTries > 15) {
+    if (failedConnectionsTries > 10) {
+      console.log("To many errors restarting in 3 secs!!!")
       restart()
     }
     failedConnectionsTries++
