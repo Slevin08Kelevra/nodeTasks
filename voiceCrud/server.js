@@ -45,8 +45,10 @@ funcs.workWindows = () => {
     }
   }); 
 }
-
-
+//https://jira.biscrum.com/secure/RapidBoard.jspa?projectKey=EDPP&rapidView=8166
+//https://confluence.biscrum.com/pages/viewpage.action?pageId=165533209
+//https://inh-ocdev.eu.boehringer.com/login
+//https://bitbucket.biscrum.com/projects/ODLMS
 
 router.get('/', function (req, res) {
   res.render('index.html');

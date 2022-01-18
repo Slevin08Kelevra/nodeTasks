@@ -1,10 +1,13 @@
 const request = require('request')
+const {table} = require("table");
 
 const reposUrl = "https://bitbucket.biscrum.com/rest/api/1.0/projects/edpp/repos"
 const pullsUrl = reposUrl + "/TARGET_REPO/pull-requests?state=merged"
 const pullActivitiesUrl = reposUrl + "/TARGET_REPO/pull-requests/PULL_NUMBER/activities"
 const startDate = new Date(2021, 10, 15).getTime()
-let countPulls = 0
+const endDate = null
+
+console.log()
 
 // simple countdown latch
 function CDL(completion) {
@@ -31,12 +34,15 @@ function doRequest(url, func) {
             }
         },
         function (error, response, body) {
-            func(body)
+            if (error){console.log(error)}
+            else {
+                func(body)
+            }
         }
     );
 }
 
-let notSameDay = 0
+let allReviewedSameDay = true
 let membersLastApp = []
 membersLastApp.pablo = { count: 0, timeAux: 0, delaySum: 0 }
 membersLastApp.jordi = { count: 0, timeAux: 0, delaySum: 0 }
@@ -45,15 +51,33 @@ membersLastApp.jonathan = { count: 0, timeAux: 0, delaySum: 0 }
 let approvalsStatistics = []
 
 var latch = new CDL(function () {
-    console.log(membersLastApp)
+    //console.log(membersLastApp)
     //console.log(approvalsStatistics)
     const sum = approvalsStatistics.reduce((a, b) => {
-        return {time: a.time + b.time}
+        return { time: a.time + b.time }
     });
     const avg = (sum.time / approvalsStatistics.length) || 0;
     const max = approvalsStatistics.reduce((prev, current) => {
         return (prev.time > current.time) ? prev : current
     })
+    let lrv, maxCount = 0, maxDelay = 0
+    for (const name in membersLastApp) {
+        if (membersLastApp[name].count > maxCount) {
+            maxCount = membersLastApp[name].count
+            maxDelay = membersLastApp[name].delaySum
+            lrv = name
+        } else if (membersLastApp[name].count === maxCount) {
+            if (membersLastApp[name].delaySum > maxDelay) {
+                lrv = name
+            }
+        }
+    }
+    console.log()
+    if (allReviewedSameDay) {
+        console.log("All Reviews solved in one day")
+    }
+    console.log()
+    console.log("Last reviewer Champion: " + lrv.toUpperCase())
     console.log()
     console.log("AVG: " + secondsToDhms(avg / 1000))
     console.log("MAX: " + secondsToDhms(max.time / 1000) + " in PR: (" + max.pr + ")")
@@ -66,10 +90,11 @@ function getExtracActivity(title) {
         let haveNeeded = acts.values.filter(act => {
             return act.action.match('MERGED|APPROVED|OPENED')
         })
-        if (haveNeeded.length > 0) console.log(title)
+        if (haveNeeded.length > 0) console.log("PR: " + title)
         let lastApproverChecked = false
         let membersLastAppTemp
         let membersLastApprovals = []
+        let tableData = []
         acts.values?.forEach(act => {
             if (act.action.match('MERGED|APPROVED|OPENED')) {
                 let approver = act.user.name.split(".")[0];
@@ -85,18 +110,21 @@ function getExtracActivity(title) {
                     }
                 }
                 if (act.action === 'OPENED') {
-                    membersLastAppTemp.delaySum += membersLastAppTemp.timeAux - act.createdDate
+                    let lastAppTimeDiff = membersLastAppTemp.timeAux - act.createdDate
+                    allReviewedSameDay = (lastAppTimeDiff > 86400000) ? false : true
+                    membersLastAppTemp.delaySum += lastAppTimeDiff
                     delete membersLastAppTemp
 
                     for (const mla in membersLastApprovals) {
-                        let obj = {time: membersLastApprovals[mla] - act.createdDate, pr: title}
+                        let obj = { time: membersLastApprovals[mla] - act.createdDate, pr: title }
                         approvalsStatistics.push(obj)
                     }
                 }
 
-                console.log("    " + act.action + "  " + act.user.name.split(".")[0] + "  " + new Date(act.createdDate).toISOString().replace('T', ' ') + "  " + act.createdDate)
+                tableData.push([act.action, act.user.name.split(".")[0], new Date(act.createdDate).toISOString().replace('T', ' '), act.createdDate])
             }
         });
+        console.log(table(tableData, getTableConfig()));
         latch.release()
     }
     return extracActivity
@@ -106,7 +134,7 @@ function getFilterPulls(repoName) {
     const filterPulls = (body) => {
         let pulls = JSON.parse(body)
         pulls.values.forEach(pull => {
-            if (pull.createdDate >= startDate) {
+            if ((startDate && pull.createdDate >= startDate && pull.createdDate < startDate) || pull.createdDate >= startDate) {
                 latch.increase()
                 let urlAux = pullActivitiesUrl.replace("TARGET_REPO", repoName).replace("PULL_NUMBER", pull.id)
                 doRequest(urlAux, getExtracActivity(pull.title))
@@ -141,4 +169,30 @@ function secondsToDhms(seconds) {
     var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
     var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return dDisplay + hDisplay + mDisplay + sDisplay;
+}
+
+function getTableConfig() {
+    const config = {
+        border: {
+            topBody: `─`,
+            topJoin: `┬`,
+            topLeft: `┌`,
+            topRight: `┐`,
+
+            bottomBody: `─`,
+            bottomJoin: `┴`,
+            bottomLeft: `└`,
+            bottomRight: `┘`,
+
+            bodyLeft: `│`,
+            bodyRight: `│`,
+            bodyJoin: `│`,
+
+            joinBody: `─`,
+            joinLeft: `├`,
+            joinRight: `┤`,
+            joinJoin: `┼`
+        }
+    };
+    return config
 }
