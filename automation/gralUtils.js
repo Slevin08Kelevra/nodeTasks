@@ -87,7 +87,7 @@ gralUtils.getGitProps = async (action) => {
         noProfile: true
     });
 
-    ps.addCommand('$p = Get-Process -Name "PanGPA"; Stop-Process -InputObject $p; Get-Process | Where-Object {$_.HasExited}')
+    ps.addCommand('$p = Get-Process -Name "PanGPA" -ErrorAction SilentlyContinue; if ($p) {Stop-Process -InputObject $p; Get-Process | Where-Object {$_.HasExited}}')
     ps.invoke().then(output => {
         gitProps(action)
     }).catch(err => {
