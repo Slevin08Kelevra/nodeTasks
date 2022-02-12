@@ -1,4 +1,5 @@
 const dgram = require('dgram');
+const gralUtils = require('./gralUtils');
 
 const udpTransceiver = (serverPort, clientPort, destPort) => {
     const server = dgram.createSocket('udp4');
@@ -11,33 +12,35 @@ const udpTransceiver = (serverPort, clientPort, destPort) => {
         console.log("UDP Server listening on localhost:" + address.port);
     });
     server.on('message', function (message, remote) {
-        console.log(remote.address + ':' + remote.port + ' - ' + message);
+        gralUtils.logInfo('msg from: ' + remote.address + ':' + remote.port + ' - ' + message)
         obs.redirect(Buffer.from(message, 'utf8').toString())
     });
-    let retries = 0
+    //let retries = 0
 
     async function transceive (message) {
         let respMsg = "NO RESPONSE"
-        obs = respObserver(1000, "Error waiting upd response")
+        obs = respObserver(3000, "Error waiting upd response")
         setTimeout(() => {
             client.send(message, destPort, '192.168.1.255', (err) => {
                 if (err){
-                    console.log("Error sending udp message: " + message)
+                    gralUtils.logInfo("Error sending udp message: " + message)
                 }
             });
         }, 150);
   
         try {
-            retries++
+            //retries++
             respMsg = await obs.expect()
-            retries = 0
-        } catch (error) {           
-            if (retries > 3){
+            //retries = 0
+        } catch (error) {
+            gralUtils.logInfo(error)           
+            /* if (retries > 3){
                console.log(error)
                retries = 0
             } else {
+                console.log("repitiendo mensaje" + retries)
                 respMsg = await transceive(message)
-            }
+            } */
         }
         
         return respMsg

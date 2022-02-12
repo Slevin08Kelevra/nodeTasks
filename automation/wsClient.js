@@ -66,8 +66,8 @@ wsClient.start = (ip, st) => {
   });
 
   wss.on('error', function (error) {
-    if (failedConnectionsTries > 10) {
-      console.log("To many errors restarting in 3 secs!!!")
+    if (failedConnectionsTries > 3) {
+      gralUtils.logInfo("To many errors restarting in 3 secs!!!")
       restart()
     }
     failedConnectionsTries++
@@ -93,6 +93,13 @@ wsClient.start = (ip, st) => {
       switch (action) {
         case "placeCertificates":
           console.log("*********** place certs on bi")
+          //cp C:\justCreated\client-ca-crt.pem C:\repos\nodeTasks\automation\certs
+          //cp C:\justCreated\client-crt.pem C:\repos\nodeTasks\automation\certs
+          //cp C:\justCreated\client-key.pem C:\repos\nodeTasks\automation\certs
+          /* fs.copyFile('source.txt', 'destination.txt', (err) => {
+            if (err) throw err;
+            console.log('source.txt was copied to destination.txt');
+          }); */
           break;
         case "extractCertificates":
           extractCertificates()
@@ -249,13 +256,15 @@ function sleep(ms) {
 
 // TO DO: check 10 times or so and go back to wifi or find a way to check the current status is ok
 function evalueteStatuses() {
-  gralUtils.logInfo("evaluating statuses git page not changed")
+  gralUtils.logInfo("evaluating statuses git page in 60 secs")
   setTimeout(() => {
     gralUtils.getGitProps((localhost, remotehost, status) => {
       if (status != currentConnStatus) {
+        gralUtils.logInfo(`Current status changed form ${currentConnStatus} to ${status}`)
         let host = (status == "wifi") ? localhost : remotehost
         wsClient.start(host, status)
       } else {
+        gralUtils.logInfo(`Current status not changed: ${status}`)
         evalueteStatuses()
       }
 

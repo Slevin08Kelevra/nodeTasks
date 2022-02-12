@@ -2,11 +2,21 @@ const shell = require('shelljs');
 const udpTransceiver = require('./../../udpTransceiver')
 const udpt = udpTransceiver(8284, 8285, 8286)
 const validator = require('./../../reqValidator');
+const gralUtils = require('./../../gralUtils');
 
 let home = {
 
     'unlock.the.gate': async ()=> {
-        return ['gate unlocked(vc-vib:2)']
+        let cmd = `GATE_1_OPEN`
+        gralUtils.logInfo('Sending cmd to Gate nodemcu ' + cmd)
+        let message = await udpt.sendWithRetry(cmd)
+        return [message + ' unlocked(vc-vib:2)']
+    },
+    'gate.driver.status': async ()=> {
+        let cmd = `GATE_STATUS`
+        gralUtils.logInfo('Sending cmd to Gate nodemcu ' + cmd)
+        let message = await udpt.sendWithRetry(cmd)
+        return ['Status: ' + message]
     },
     'ventilation.start': async ()=>{
         return ['ventilation start']
