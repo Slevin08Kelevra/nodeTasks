@@ -96,6 +96,8 @@ gralUtils.getGitProps = async (action) => {
     });
 }
 
+
+//TODO: cambiar por aws en vez de git?
 function gitProps(action) {
     request
         .get(validator.getGitUrl())
