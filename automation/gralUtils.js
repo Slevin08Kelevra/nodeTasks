@@ -103,6 +103,7 @@ function gitProps(action) {
         .get(validator.getGitUrl())
         .on('response', async (response) => {
             if (response.statusCode == 200) {
+                gralUtils.logInfo("Git props ok!!!")
                 response.on('data', (data) => {
                     let $ = cheerio.load(data);
 

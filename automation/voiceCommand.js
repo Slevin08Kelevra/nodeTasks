@@ -25,16 +25,13 @@ if (process.env.COMPUTER_NAME != 'UBUNTU') {
     gralUtils.logInfo('Git pull to ' + gitDir)
     let git = simpleGit(gitDir);
     git.pull((err, update) => {
-        if (update && update.summary.changes) {
-            gralUtils.logInfo('Git pull changes found!')
-            gralUtils.logInfo(gralUtils.retartApp(10))
-
-        } else {
-            gralUtils.logInfo('Git with no changes, keep as if.')
-        }
-
         if (err) {
             gralUtils.logError('Cant pull from git')
+        } else if (update && update.summary.changes) {
+            gralUtils.logInfo('Git pull changes found!')
+            gralUtils.logInfo(gralUtils.retartApp(10))
+        } else {
+            gralUtils.logInfo('Git with no changes, keep as if.')
         }
 
     })

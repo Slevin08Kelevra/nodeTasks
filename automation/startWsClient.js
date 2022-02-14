@@ -10,7 +10,10 @@ let gitDir = gitDirArr.join('\\')
 gralUtils.logInfo('Git pull to ' + gitDir)
 let git = simpleGit(gitDir);
 git.pull((err, update) => {
-    if (update && update.summary.changes) {
+    if (err) {
+        gralUtils.logError('Cant pull from git')
+        doStart()
+    } else if (update && update.summary.changes) {
         const time = new Date();
         const filename = __dirname + "\\restart.do"
 
@@ -24,11 +27,6 @@ git.pull((err, update) => {
         gralUtils.logInfo('Git pull changes, restarting app now.')
     } else {
         gralUtils.logInfo('Git with no changes, keep as if.')
-        doStart()
-    }
-
-    if (err) {
-        gralUtils.logError('Cant pull from git')
         doStart()
     }
 
