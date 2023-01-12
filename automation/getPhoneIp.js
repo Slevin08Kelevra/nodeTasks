@@ -1,18 +1,14 @@
-const puppeteer = require('puppeteer-extra');
-stealthPlugin = require('puppeteer-extra-plugin-stealth');
-const UserAgent = require('user-agents');
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0 Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0';
+const puppeteer = require('puppeteer');
 
 
-puppeteer.use(stealthPlugin());
 
 async function get() {
 
     const chromeOptions = {
-        headless: false,
-        executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-        ignoreHTTPSErrors: true,
-        args: ['--start-maximized']
+        headless: true,
+        //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+        //ignoreHTTPSErrors: true,
+        //args: ['--start-maximized']
     };
 
     const browser = await puppeteer.launch(chromeOptions);
@@ -20,10 +16,7 @@ async function get() {
     try {
 
         const page = (await browser.pages())[0];
-        const userAgent = new UserAgent();
-        const UA = USER_AGENT;
-        await page.setUserAgent(UA);
-        await page.setJavaScriptEnabled(true);
+  
 
         await page.goto('http://192.168.1.1', { waitUntil: 'load', timeout: 0 });
 
