@@ -35,7 +35,7 @@ async function get() {
             return divs.map(div => Array.from(div.querySelectorAll('span')).map(span => span.innerText))
         });
 
-        console.log(data.find(row => row[0] == 'realme-8')?.[2]);
+        console.log(data.find(row => row[0] == 'realme-8')[2]);
 
         console.log("done");
 
