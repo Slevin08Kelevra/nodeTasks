@@ -1,6 +1,10 @@
 {
   "dependencies": {
+    "puppeteer": "^19.4.1",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1",
     "queue-fifo": "^0.2.6",
-    "to-words": "^2.3.1"
+    "to-words": "^2.3.1",
+    "user-agents": "^1.0.1252"
   }
 }

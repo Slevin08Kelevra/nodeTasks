@@ -16,7 +16,7 @@ async function get() {
     try {
 
         const page = (await browser.pages())[0];
-  
+
 
         await page.goto('http://192.168.1.1', { waitUntil: 'load', timeout: 0 });
 
@@ -25,7 +25,7 @@ async function get() {
         await page.$eval('#Frm_Username', el => el.value = '1234');
         await page.$eval('#Frm_Password', el => el.value = 'Slevin08Kelevra');
 
-        await page.$eval('input[id=LoginId]', el => el.click());
+        await page.$eval('input[id=LoginId]', login => login.click());
 
         await page.waitForSelector('#home_devitem');
         await page.waitForSelector('#template_home_devitem_0');
@@ -35,16 +35,24 @@ async function get() {
             return divs.map(div => Array.from(div.querySelectorAll('span')).map(span => span.innerText))
         });
 
-        console.log(data.find(row => row[0] == 'realme-8')[2]);
+        const phnoeRow = data.find(row => row[0] == 'realme-8');
 
-        console.log("done");
+        if (!phnoeRow) {
+            console.log("***********************");
+            console.log("***Phone out of home***");
+            console.log("***********************");
+        } else {
+            console.log(data.find(row => row[0] == 'realme-8')[2]);
+        }
 
+        console.log("done, closing browser");
 
+        await page.$eval('div[id=LogOffLnk]', logout => logout.click());
 
     } catch (error) {
         throw error;
     } finally {
-        //await browser.close();
+        await browser.close();
     }
 
 }
