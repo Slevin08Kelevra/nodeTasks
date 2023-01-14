@@ -1,8 +1,15 @@
 const puppeteer = require('puppeteer');
+const schedule = require('node-schedule');
 
+function startSchedule() {
+    schedule.scheduleJob('*/1 * * * *', function () {
 
+        getPhoneIp()
 
-async function get() {
+    });
+}
+
+async function getPhoneIp() {
 
     const chromeOptions = {
         headless: true,
@@ -57,4 +64,4 @@ async function get() {
 
 }
 
-get();
+startSchedule();
