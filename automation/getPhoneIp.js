@@ -57,7 +57,7 @@ async function getPhoneIp() {
         await page.$eval('div[id=LogOffLnk]', logout => logout.click());
 
     } catch (error) {
-        throw error;
+        console.error(error);
     } finally {
         await browser.close();
     }
