@@ -1,12 +1,33 @@
 const puppeteer = require('puppeteer');
 const schedule = require('node-schedule');
+var ping = require('ping');
 
 function startSchedule() {
     schedule.scheduleJob('*/1 * * * *', function () {
-
-        getPhoneIp()
-
+        console.log("pingin");
+        pingPhone()
+610
     });
+}
+
+async function pingPhone() {
+    var hosts = ['192.168.1.132'];
+    for (let host of hosts) {
+        // WARNING: -i 2 argument may not work in other platform like windows
+        let res = await ping.promise.probe(host, {
+            timeout: 10,
+            min_reply: 3,
+        });
+        //console.log(res.alive);
+        var d = new Date();
+        var time = d.toLocaleTimeString(); 
+        if (res.alive){
+            console.log(time + " - phone home");
+        } else {
+            console.log(time + " - *** PHONE GONE ALERT ***");
+        }
+        
+    }
 }
 
 async function getPhoneIp() {
@@ -54,7 +75,7 @@ async function getPhoneIp() {
 
         console.log("done, closing browser");
 
-        await page.$eval('div[id=LogOffLnk]', logout => logout.click());
+        agm
 
     } catch (error) {
         console.error(error);

@@ -33,9 +33,9 @@ async function get() {
             } catch (e) {}
            });
 
-        /* await page.waitForSelector('.messageBoxAction')
+         await page.waitForSelector('.messageBoxAction')
         await page.click('.messageBoxAction');
-        await page.waitForTimeout(1000); */
+        await page.waitForTimeout(1000); 
 
         
 
