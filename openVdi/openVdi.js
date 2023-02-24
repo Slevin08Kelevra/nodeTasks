@@ -26,16 +26,16 @@ async function get() {
 
         await page.goto('https://webapps.vdi2.ford.com/Citrix/EDC2Web/', { waitUntil: 'load', timeout: 0 });
 
-        await page.on("dialog", async dialog => {
+        /* await page.on("dialog", async dialog => {
             try {
                 console.log(dialog.message());
              await dialog.accept();
             } catch (e) {}
-           });
+           }); */
 
-         await page.waitForSelector('.messageBoxAction')
+        /*  await page.waitForSelector('.messageBoxAction')
         await page.click('.messageBoxAction');
-        await page.waitForTimeout(1000); 
+        await page.waitForTimeout(1000);  */
 
         
 

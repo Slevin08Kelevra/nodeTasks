@@ -3,10 +3,9 @@ const schedule = require('node-schedule');
 var ping = require('ping');
 
 function startSchedule() {
-    schedule.scheduleJob('*/1 * * * *', function () {
+    schedule.scheduleJob('*/30 * * * * *', function () {
         console.log("pingin");
-        pingPhone()
-610
+        getPhoneIp();
     });
 }
 
@@ -30,6 +29,7 @@ async function pingPhone() {
     }
 }
 
+let browser;
 async function getPhoneIp() {
 
     const chromeOptions = {
@@ -39,7 +39,10 @@ async function getPhoneIp() {
         //args: ['--start-maximized']
     };
 
-    const browser = await puppeteer.launch(chromeOptions);
+    if (browser == null){
+        browser = await puppeteer.launch(chromeOptions);
+    }
+    
 
     try {
 
@@ -73,14 +76,15 @@ async function getPhoneIp() {
             console.log(data.find(row => row[0] == 'realme-8')[2]);
         }
 
-        console.log("done, closing browser");
+        console.log("done, loging out");
+        await page.click('#LogOffLnk');
 
-        agm
 
     } catch (error) {
         console.error(error);
-    } finally {
         await browser.close();
+    } finally {
+        //await browser.close();
     }
 
 }
