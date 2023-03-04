@@ -42,7 +42,7 @@ async function getPhoneIp() {
     if (browser == null){
         browser = await puppeteer.launch(chromeOptions);
     }
-    
+    console.log("Browser ready!!!")
 
     try {
 
