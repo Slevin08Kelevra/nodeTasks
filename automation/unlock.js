@@ -1,4 +1,4 @@
-const { SerialPort } = require('serialport')
+const  SerialPort = require('serialport')
 var myArgs = process.argv.slice(2);
 
 let path = ''
@@ -13,7 +13,8 @@ SerialPort.list().then(ports => {
 
         if (typeof pm !== 'undefined' && pm.includes('Microsoft')) {
             path = port.path
-            ArduinoPort = new SerialPort({ path: path, baudRate: 9600 })
+            console.log(path)
+            ArduinoPort = new SerialPort( path, 9600)
             ArduinoPort.on('open', function () {
                 ArduinoPort.write(myArgs[0], function (err, result) {
                     if (err) {
